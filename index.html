@@ -1,0 +1,2555 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kigali Bites | Delicious Food in Kigali</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🍽️</text></svg>">
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    
+    <style>
+        /* ==================== BASE ==================== */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --primary: #e8a87c; --primary-dark: #d4956b;
+            --dark: #1a1a1a; --light: #fdf8f3;
+            --gold: #f4c542; --success: #4caf50; --danger: #ff4757;
+            --warning: #ffc107; --info: #2196f3; --radius: 20px;
+        }
+        html { scroll-behavior: smooth; }
+        body { font-family: 'Inter', sans-serif; background: #0a0a0a; color: #fff; overflow-x: hidden; min-height: 100vh; }
+        button { font-family: inherit; }
+        
+        /* ==================== LOADER ==================== */
+        #loader {
+            position: fixed; inset: 0; z-index: 99999;
+            background: radial-gradient(circle at center, #1a1208 0%, #0a0a0a 70%);
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            transition: opacity 0.6s ease, visibility 0.6s ease; overflow: hidden;
+        }
+        #loader.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
+        #loader::before, #loader::after {
+            content: ''; position: absolute; border-radius: 50%;
+            border: 2px solid rgba(232,168,124,0.1);
+            animation: rippleExpand 3s ease-out infinite;
+        }
+        #loader::before { width: 200px; height: 200px; }
+        #loader::after { width: 200px; height: 200px; animation-delay: 1.5s; }
+        @keyframes rippleExpand {
+            0% { transform: scale(0.5); opacity: 0.8; }
+            100% { transform: scale(3); opacity: 0; }
+        }
+        .loader-content { text-align: center; position: relative; z-index: 2; }
+        .plate-loader { position: relative; width: 140px; height: 140px; margin: 0 auto 1.5rem; }
+        .plate-ring { position: absolute; inset: 0; border-radius: 50%; border: 3px dashed rgba(232,168,124,0.3); animation: spinSlow 8s linear infinite; }
+        .plate-ring:nth-child(2) { inset: 15px; border: 3px solid rgba(232,168,124,0.15); border-top-color: var(--primary); animation: spinFast 1.5s linear infinite; }
+        .plate-center {
+            position: absolute; inset: 40px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            font-size: 2.5rem; box-shadow: 0 0 40px rgba(232,168,124,0.5);
+            animation: platePulse 2s ease-in-out infinite;
+        }
+        @keyframes spinSlow { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        @keyframes spinFast { from { transform: rotate(0deg); } to { transform: rotate(-360deg); } }
+        @keyframes platePulse { 0%, 100% { box-shadow: 0 0 40px rgba(232,168,124,0.5); } 50% { box-shadow: 0 0 70px rgba(232,168,124,0.8); } }
+        .loader-content h2 { font-family: 'Playfair Display', serif; font-size: 2.5rem; color: var(--primary); margin-top: 0.5rem; letter-spacing: 2px; }
+        .loader-content p { color: #888; font-size: 0.85rem; letter-spacing: 4px; text-transform: uppercase; margin-top: 0.3rem; min-height: 1.2em; }
+        .loader-progress { width: 280px; height: 6px; background: rgba(255,255,255,0.08); border-radius: 50px; margin: 2rem auto 0; overflow: hidden; }
+        .loader-progress-bar {
+            height: 100%; width: 0%;
+            background: linear-gradient(90deg, var(--primary), var(--gold), var(--primary));
+            background-size: 200% 100%; border-radius: 50px;
+            transition: width 0.3s ease;
+            animation: gradientShift 1.5s linear infinite;
+        }
+        @keyframes gradientShift { 0% { background-position: 0% 50%; } 100% { background-position: 200% 50%; } }
+        .loader-percent { color: var(--primary); font-family: 'Playfair Display', serif; font-weight: 700; margin-top: 0.8rem; font-size: 1.1rem; letter-spacing: 2px; }
+        .floating-food { position: absolute; font-size: 1.8rem; animation: orbitFood 6s linear infinite; pointer-events: none; opacity: 0.4; }
+        .floating-food:nth-child(1) { top: 5%; left: 20%; animation-delay: 0s; }
+        .floating-food:nth-child(2) { top: 5%; right: 20%; animation-delay: 1.5s; }
+        .floating-food:nth-child(3) { bottom: 5%; left: 20%; animation-delay: 3s; }
+        .floating-food:nth-child(4) { bottom: 5%; right: 20%; animation-delay: 4.5s; }
+        @keyframes orbitFood { 0%, 100% { transform: translateY(0) rotate(0deg); opacity: 0.4; } 50% { transform: translateY(-20px) rotate(15deg); opacity: 0.8; } }
+        
+        /* ==================== WHATSAPP ==================== */
+        .whatsapp-float {
+            position: fixed; bottom: 25px; right: 25px; z-index: 9998;
+            background: #25D366; color: white; width: 65px; height: 65px;
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            font-size: 2.2rem; box-shadow: 0 8px 35px rgba(37,211,102,0.4);
+            text-decoration: none; transition: all 0.3s ease;
+            animation: whatsappPulse 2.5s ease-in-out infinite;
+        }
+        .whatsapp-float:hover { transform: scale(1.12) rotate(-5deg); }
+        @keyframes whatsappPulse { 0%,100% { box-shadow: 0 8px 35px rgba(37,211,102,0.4); } 50% { box-shadow: 0 8px 55px rgba(37,211,102,0.7); } }
+        
+        /* ==================== HEADER ==================== */
+        header {
+            background: rgba(10,10,10,0.92); backdrop-filter: blur(20px);
+            padding: 0.8rem 2rem; display: flex; justify-content: space-between;
+            align-items: center; position: sticky; top: 0; z-index: 999;
+            border-bottom: 2px solid rgba(232,168,124,0.15);
+        }
+        .logo { font-family: 'Playfair Display', serif; font-size: 1.8rem; font-weight: 900; color: white; display: flex; align-items: center; gap: 0.5rem; cursor: pointer; }
+        .logo span { color: var(--primary); }
+        .logo i { color: var(--primary); }
+        .admin-badge { background: linear-gradient(135deg, var(--danger), #c0392b); color: white; padding: 0.2rem 0.6rem; border-radius: 50px; font-size: 0.65rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; margin-left: 0.3rem; }
+        
+        .page-tabs { display: flex; gap: 0.5rem; align-items: center; }
+        .page-tab {
+            padding: 0.6rem 1.5rem; border-radius: 50px;
+            background: transparent; color: #aaa; border: 2px solid transparent;
+            font-weight: 600; font-size: 0.9rem; cursor: pointer;
+            transition: all 0.3s ease; display: flex; align-items: center; gap: 0.5rem;
+        }
+        .page-tab:hover { color: white; background: rgba(255,255,255,0.05); }
+        .page-tab.active { background: var(--primary); color: #1a1a1a; border-color: var(--primary); }
+        
+        .nav-actions { display: flex; align-items: center; gap: 1.2rem; }
+        .auth-btn {
+            padding: 0.5rem 1.5rem; border-radius: 50px; background: var(--primary);
+            color: #1a1a1a; border: none; font-weight: 600; cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .auth-btn:hover { background: var(--primary-dark); transform: scale(1.05); }
+        .cart-icon { position: relative; color: white; font-size: 1.3rem; cursor: pointer; }
+        .cart-count {
+            position: absolute; top: -8px; right: -10px; background: var(--primary);
+            color: #1a1a1a; font-size: 0.65rem; font-weight: 700; width: 20px; height: 20px;
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+        }
+        .user-badge { display: none; align-items: center; gap: 0.5rem; color: white; font-size: 0.9rem; }
+        .user-badge .avatar {
+            width: 35px; height: 35px; border-radius: 50%;
+            background: var(--primary); display: flex; align-items: center;
+            justify-content: center; font-weight: 700; color: #1a1a1a; cursor: pointer;
+        }
+        .logout-btn { background: none; border: none; color: var(--danger); cursor: pointer; font-size: 0.8rem; padding: 0.2rem 0.5rem; border-radius: 8px; }
+        .logout-btn:hover { background: rgba(255,71,87,0.1); }
+        .hamburger { display: none; flex-direction: column; gap: 5px; cursor: pointer; background: none; border: none; padding: 5px; }
+        .hamburger span { width: 28px; height: 2.5px; background: white; border-radius: 10px; transition: all 0.3s ease; }
+        .hamburger.active span:nth-child(1) { transform: rotate(45deg) translate(5px,5px); }
+        .hamburger.active span:nth-child(2) { opacity: 0; }
+        .hamburger.active span:nth-child(3) { transform: rotate(-45deg) translate(5px,-5px); }
+        
+        /* ==================== PAGES ==================== */
+        .page { display: none; min-height: calc(100vh - 60px); animation: pageIn 0.4s ease; }
+        .page.active { display: block; }
+        @keyframes pageIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+        
+        /* ==================== HOME ==================== */
+        .hero {
+            min-height: 90vh;
+            background: linear-gradient(rgba(0,0,0,0.55), rgba(0,0,0,0.75)),
+                        url('https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=1600') center/cover fixed;
+            display: flex; align-items: center; justify-content: center; text-align: center; padding: 2rem;
+        }
+        .hero-content { max-width: 800px; animation: fadeUp 1s ease; }
+        .hero-content .tagline { font-size: 1rem; color: var(--primary); letter-spacing: 6px; text-transform: uppercase; font-weight: 300; }
+        .hero-content h1 { font-family: 'Playfair Display', serif; font-size: 5rem; font-weight: 900; margin: 0.5rem 0; }
+        .hero-content h1 span { color: var(--primary); }
+        .hero-content p { font-size: 1.3rem; opacity: 0.9; margin-bottom: 2rem; }
+        .store-status {
+            display: inline-flex; align-items: center; gap: 0.5rem;
+            background: rgba(255,255,255,0.1); backdrop-filter: blur(10px);
+            padding: 0.5rem 1.2rem; border-radius: 50px;
+            font-size: 0.9rem; font-weight: 600; margin-bottom: 1.5rem;
+        }
+        .store-status .dot { width: 10px; height: 10px; border-radius: 50%; animation: pulseDot 1.5s ease-in-out infinite; }
+        .store-status.open .dot { background: #4caf50; box-shadow: 0 0 10px #4caf50; }
+        .store-status.closed .dot { background: #ff4757; box-shadow: 0 0 10px #ff4757; }
+        @keyframes pulseDot { 0%,100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.6; transform: scale(1.3); } }
+        @keyframes fadeUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+        .btn-group { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
+        .btn { padding: 0.9rem 2.8rem; border-radius: 50px; font-weight: 600; text-decoration: none; font-size: 1rem; transition: all 0.3s ease; border: none; cursor: pointer; }
+        .btn-primary { background: var(--primary); color: #1a1a1a; }
+        .btn-primary:hover { background: var(--primary-dark); transform: translateY(-3px); box-shadow: 0 12px 35px rgba(232,168,124,0.4); }
+        .btn-secondary { background: transparent; color: white; border: 2px solid white; }
+        .btn-secondary:hover { background: white; color: #1a1a1a; transform: translateY(-3px); }
+        .btn-gold { background: var(--gold); color: #1a1a1a; }
+        .btn-gold:hover { background: #e6b800; transform: translateY(-3px); }
+        .hero-content .stats { display: flex; justify-content: center; gap: 3rem; margin-top: 2.5rem; }
+        .hero-content .stats .number { font-size: 2.5rem; font-weight: 800; color: var(--primary); font-family: 'Playfair Display', serif; }
+        .hero-content .stats .label { font-size: 0.8rem; text-transform: uppercase; opacity: 0.7; display: block; }
+        
+        .featured-section { padding: 5rem 2rem; background: #0a0a0a; }
+        .featured-section h2 { text-align: center; font-family: 'Playfair Display', serif; font-size: 2.5rem; margin-bottom: 0.5rem; }
+        .featured-section h2 span { color: var(--primary); }
+        .featured-section .subtitle { text-align: center; color: #aaa; margin-bottom: 3rem; }
+        .featured-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 2rem; max-width: 1200px; margin: 0 auto; }
+        .featured-card {
+            background: rgba(255,255,255,0.04); border-radius: var(--radius);
+            overflow: hidden; border: 1px solid rgba(255,255,255,0.06);
+            transition: all 0.3s ease; cursor: pointer;
+        }
+        .featured-card:hover { transform: translateY(-8px); border-color: var(--primary); box-shadow: 0 20px 50px rgba(0,0,0,0.4); }
+        .featured-card img { width: 100%; height: 200px; object-fit: cover; }
+        .featured-card .fc-body { padding: 1.2rem; }
+        .featured-card .fc-body h4 { font-size: 1.1rem; margin-bottom: 0.3rem; }
+        .featured-card .fc-body .price { color: var(--primary); font-weight: 700; }
+        .featured-card .fc-body .order-now {
+            display: inline-block; margin-top: 0.7rem; padding: 0.4rem 1rem;
+            background: var(--primary); color: #1a1a1a; border-radius: 50px;
+            font-weight: 600; font-size: 0.8rem; border: none; cursor: pointer;
+        }
+        
+        .why-section { padding: 5rem 2rem; background: linear-gradient(135deg, #1a1208 0%, #0a0a0a 100%); }
+        .why-section h2 { text-align: center; font-family: 'Playfair Display', serif; font-size: 2.5rem; margin-bottom: 3rem; }
+        .why-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 2rem; max-width: 1100px; margin: 0 auto; }
+        .why-card {
+            text-align: center; padding: 2rem 1.5rem;
+            background: rgba(255,255,255,0.04); border-radius: var(--radius);
+            border: 1px solid rgba(255,255,255,0.06); transition: all 0.3s ease;
+        }
+        .why-card:hover { transform: translateY(-6px); border-color: var(--primary); }
+        .why-card .icon { font-size: 3rem; margin-bottom: 1rem; }
+        .why-card h3 { font-size: 1.15rem; margin-bottom: 0.5rem; font-family: 'Playfair Display', serif; }
+        .why-card p { color: #aaa; font-size: 0.9rem; }
+        
+        /* ==================== MENU ==================== */
+        .menu-board {
+            padding: 4rem 2rem;
+            background: linear-gradient(rgba(0,0,0,0.85), rgba(0,0,0,0.9)),
+                        url('https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=1600') center/cover fixed;
+            min-height: 100vh;
+        }
+        .menu-board .section-header { text-align: center; margin-bottom: 3rem; }
+        .menu-board .section-header h2 { font-family: 'Playfair Display', serif; font-size: 3.5rem; }
+        .menu-board .section-header h2 span { color: var(--primary); }
+        .menu-board .section-header p { color: #aaa; font-size: 1.1rem; }
+        .search-container { display: flex; justify-content: center; margin-bottom: 2rem; }
+        .search-container input {
+            padding: 0.8rem 2rem; border-radius: 50px;
+            border: 2px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.05);
+            font-size: 1rem; width: 100%; max-width: 450px; color: white;
+        }
+        .search-container input:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 4px rgba(232,168,124,0.15); }
+        .search-container input::placeholder { color: #666; }
+        .tabs { display: flex; justify-content: center; gap: 0.8rem; flex-wrap: wrap; margin-bottom: 3rem; }
+        .tab-btn {
+            padding: 0.7rem 2rem; border: 2px solid rgba(255,255,255,0.1);
+            background: transparent; border-radius: 50px; font-weight: 600;
+            font-size: 0.9rem; cursor: pointer; transition: all 0.3s ease; color: #aaa;
+        }
+        .tab-btn:hover { border-color: var(--primary); color: white; }
+        .tab-btn.active { background: var(--primary); border-color: var(--primary); color: #1a1a1a; }
+        .menu-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 2rem; max-width: 1200px; margin: 0 auto; }
+        .menu-card {
+            background: rgba(255,255,255,0.05); backdrop-filter: blur(10px);
+            border-radius: var(--radius); overflow: hidden;
+            transition: all 0.4s ease; border: 1px solid rgba(255,255,255,0.06);
+        }
+        .menu-card:hover { transform: translateY(-8px); border-color: var(--primary); box-shadow: 0 20px 50px rgba(0,0,0,0.3); }
+        .menu-card .food-img { width: 100%; height: 200px; object-fit: cover; }
+        .menu-card .card-body { padding: 1.5rem; }
+        .menu-card .dish-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 0.5rem; }
+        .menu-card .dish-name { font-weight: 700; font-size: 1.1rem; }
+        .menu-card .price { color: var(--primary); font-weight: 800; font-size: 1.1rem; white-space: nowrap; }
+        .menu-card .dish-desc { font-size: 0.9rem; color: #aaa; margin: 0.5rem 0; min-height: 40px; }
+        .menu-card .dish-tags { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1rem; }
+        .menu-card .dish-tags span {
+            font-size: 0.65rem; padding: 0.2rem 0.8rem; border-radius: 50px;
+            background: rgba(232,168,124,0.15); color: var(--primary);
+            font-weight: 600; text-transform: uppercase;
+        }
+        .menu-card .dish-footer { display: flex; justify-content: space-between; align-items: center; gap: 0.5rem; }
+        .menu-card .add-btn {
+            background: var(--primary); border: none; color: #1a1a1a;
+            padding: 0.6rem 1.5rem; border-radius: 50px; font-weight: 600;
+            font-size: 0.85rem; cursor: pointer; transition: all 0.3s ease; flex: 1;
+        }
+        .menu-card .add-btn:hover { background: var(--primary-dark); transform: scale(1.02); }
+        .qty-controls { display: none; align-items: center; gap: 0.5rem; background: rgba(232,168,124,0.15); border-radius: 50px; padding: 0.3rem; flex: 1; }
+        .qty-controls.active { display: flex; }
+        .qty-controls button {
+            width: 32px; height: 32px; border-radius: 50%;
+            background: var(--primary); color: #1a1a1a;
+            border: none; cursor: pointer; font-weight: 700; font-size: 1rem;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .qty-controls button:hover { background: var(--primary-dark); transform: scale(1.1); }
+        .qty-controls .qty-value { flex: 1; text-align: center; font-weight: 700; color: var(--primary); font-size: 1rem; }
+        
+        /* ==================== REVIEWS ==================== */
+        .reviews-page {
+            padding: 5rem 2rem;
+            background: linear-gradient(rgba(0,0,0,0.85), rgba(0,0,0,0.9)),
+                        url('https://images.unsplash.com/photo-1552566626-52f8b828add9?w=1600') center/cover fixed;
+            min-height: 100vh; text-align: center;
+        }
+        .reviews-page h2 { font-family: 'Playfair Display', serif; font-size: 3.5rem; }
+        .reviews-page h2 span { color: var(--primary); }
+        .reviews-page .subtitle { color: #aaa; margin-bottom: 2rem; font-size: 1.1rem; }
+        
+        .review-submit-box {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(232,168,124,0.25);
+            border-radius: var(--radius);
+            padding: 2rem;
+            max-width: 600px;
+            margin: 0 auto 3rem;
+            text-align: left;
+            backdrop-filter: blur(10px);
+        }
+        .review-submit-box h3 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.4rem;
+            color: var(--primary);
+            margin-bottom: 0.3rem;
+        }
+        .review-submit-box p {
+            color: #aaa;
+            font-size: 0.9rem;
+            margin-bottom: 1.5rem;
+        }
+        .star-picker {
+            display: flex;
+            gap: 0.5rem;
+            font-size: 2.2rem;
+            margin-bottom: 1.2rem;
+            cursor: pointer;
+            justify-content: flex-start;
+        }
+        .star-picker .star-pick {
+            color: #444;
+            transition: all 0.2s ease;
+            user-select: none;
+        }
+        .star-picker .star-pick.active,
+        .star-picker .star-pick.hover {
+            color: var(--gold);
+            transform: scale(1.15);
+        }
+        .review-submit-box textarea {
+            width: 100%;
+            padding: 1rem;
+            border-radius: 12px;
+            border: 2px solid rgba(255,255,255,0.06);
+            background: rgba(255,255,255,0.05);
+            color: white;
+            font-size: 1rem;
+            font-family: inherit;
+            resize: vertical;
+            min-height: 100px;
+            margin-bottom: 1rem;
+        }
+        .review-submit-box textarea:focus { outline: none; border-color: var(--primary); }
+        .review-submit-box textarea::placeholder { color: #666; }
+        
+        .reviews-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 2rem; max-width: 1200px; margin: 0 auto; }
+        .review-card {
+            background: rgba(255,255,255,0.05); backdrop-filter: blur(10px);
+            padding: 2rem; border-radius: var(--radius); text-align: left;
+            border: 1px solid rgba(255,255,255,0.05); transition: all 0.3s ease;
+        }
+        .review-card:hover { background: rgba(255,255,255,0.08); transform: translateY(-6px); border-color: var(--primary); }
+        .review-card .stars { color: var(--gold); font-size: 1.1rem; margin-bottom: 0.8rem; }
+        .review-card .review-text { opacity: 0.95; margin: 0.5rem 0; font-size: 1rem; line-height: 1.6; }
+        .review-card .reviewer { font-weight: 600; display: flex; align-items: center; gap: 0.8rem; margin-top: 1rem; }
+        .review-card .reviewer .avatar {
+            width: 45px; height: 45px; border-radius: 50%; background: var(--primary);
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 700; color: #1a1a1a; font-size: 1.1rem;
+        }
+        
+        /* ==================== CONTACT ==================== */
+        .contact-page { padding: 5rem 2rem; background: #0a0a0a; min-height: 100vh; }
+        .contact-page h2 { font-family: 'Playfair Display', serif; font-size: 3.5rem; text-align: center; }
+        .contact-page h2 span { color: var(--primary); }
+        .contact-page .subtitle { text-align: center; color: #aaa; margin-bottom: 3rem; }
+        .contact-wrapper { display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; max-width: 1100px; margin: 2rem auto 0; }
+        .map-container { border-radius: var(--radius); overflow: hidden; height: 450px; border: 2px solid rgba(232,168,124,0.2); }
+        .map-container iframe { width: 100%; height: 100%; border: none; }
+        .contact-info { display: flex; flex-direction: column; gap: 1.5rem; justify-content: center; }
+        .contact-info .info-item {
+            display: flex; align-items: center; gap: 1rem; font-size: 1.05rem;
+            padding: 1rem; background: rgba(255,255,255,0.03);
+            border-radius: 12px; border-left: 3px solid var(--primary);
+        }
+        .contact-info .info-item i {
+            width: 45px; height: 45px; border-radius: 50%; background: var(--primary);
+            color: #1a1a1a; display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+            font-size: 1.1rem;
+        }
+        
+        /* ==================== DASHBOARD ==================== */
+        .dashboard-container { max-width: 1200px; margin: 0 auto; padding: 2rem 1.5rem 4rem; }
+        .welcome-card {
+            background: linear-gradient(135deg, #2d1b14 0%, #4a2c1e 100%);
+            border-radius: var(--radius); padding: 2.5rem 2rem;
+            margin-bottom: 2rem; display: flex; justify-content: space-between;
+            align-items: center; gap: 1.5rem; flex-wrap: wrap;
+            border: 1px solid rgba(232,168,124,0.2); position: relative; overflow: hidden;
+        }
+        .welcome-card::before { content: '👤'; position: absolute; font-size: 14rem; right: -2rem; bottom: -3rem; opacity: 0.04; }
+        .welcome-card .welcome-text { position: relative; z-index: 1; }
+        .welcome-card .welcome-text .tag { font-size: 0.8rem; color: var(--primary); letter-spacing: 3px; text-transform: uppercase; font-weight: 600; }
+        .welcome-card .welcome-text h1 { font-family: 'Playfair Display', serif; font-size: 2.3rem; margin: 0.3rem 0; }
+        .welcome-card .welcome-text h1 span { color: var(--primary); }
+        .welcome-card .welcome-text p { color: #aaa; font-size: 0.95rem; }
+        .big-avatar {
+            width: 100px; height: 100px; border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: #1a1a1a; display: flex; align-items: center; justify-content: center;
+            font-family: 'Playfair Display', serif; font-size: 2.8rem; font-weight: 900;
+            border: 4px solid rgba(255,255,255,0.1); position: relative; z-index: 1;
+            box-shadow: 0 8px 30px rgba(232,168,124,0.4);
+        }
+        
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1.2rem; margin-bottom: 2rem; }
+        .stat-box {
+            background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.06);
+            border-radius: var(--radius); padding: 1.5rem; text-align: center;
+            transition: all 0.3s ease;
+        }
+        .stat-box:hover { transform: translateY(-4px); border-color: var(--primary); }
+        .stat-box .icon { font-size: 1.8rem; color: var(--primary); margin-bottom: 0.4rem; }
+        .stat-box .num { font-family: 'Playfair Display', serif; font-size: 2rem; font-weight: 800; line-height: 1; }
+        .stat-box .lbl { font-size: 0.8rem; color: #888; margin-top: 0.4rem; text-transform: uppercase; letter-spacing: 1px; font-weight: 600; }
+        
+        .dash-tabs { display: flex; gap: 0.5rem; margin-bottom: 2rem; overflow-x: auto; padding-bottom: 0.5rem; scrollbar-width: none; }
+        .dash-tabs::-webkit-scrollbar { display: none; }
+        .dash-tab {
+            padding: 0.7rem 1.5rem; background: transparent; border: 2px solid transparent;
+            color: #888; font-weight: 600; font-size: 0.9rem; cursor: pointer;
+            border-radius: 50px; transition: all 0.3s ease;
+            display: flex; align-items: center; gap: 0.5rem; white-space: nowrap;
+        }
+        .dash-tab:hover { color: white; background: rgba(255,255,255,0.05); }
+        .dash-tab.active { background: var(--primary); color: #1a1a1a; border-color: var(--primary); }
+        .dash-panel { display: none; animation: fadeIn 0.4s ease; }
+        .dash-panel.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        
+        .order-list { display: flex; flex-direction: column; gap: 1rem; }
+        .order-card {
+            background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.06);
+            border-radius: var(--radius); padding: 1.5rem; border-left: 4px solid var(--primary);
+            transition: all 0.3s ease;
+        }
+        .order-card:hover { background: rgba(255,255,255,0.06); transform: translateX(4px); }
+        .order-header { display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 0.8rem; margin-bottom: 1rem; }
+        .order-id { font-family: monospace; font-weight: 700; color: var(--primary); font-size: 1.05rem; }
+        .order-date { font-size: 0.8rem; color: #888; margin-top: 0.2rem; }
+        .status-badge { padding: 0.35rem 0.9rem; border-radius: 50px; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+        .status-badge.pending { background: rgba(255,193,7,0.15); color: var(--warning); }
+        .status-badge.confirmed { background: rgba(33,150,243,0.15); color: var(--info); }
+        .status-badge.preparing { background: rgba(232,168,124,0.2); color: var(--primary); }
+        .status-badge.ready { background: rgba(76,175,80,0.15); color: var(--success); }
+        .status-badge.delivered { background: rgba(76,175,80,0.15); color: var(--success); }
+        .status-badge.cancelled { background: rgba(255,71,87,0.15); color: var(--danger); }
+        .order-items { background: rgba(0,0,0,0.2); padding: 1rem; border-radius: 12px; margin-bottom: 1rem; }
+        .order-item-line { display: flex; justify-content: space-between; padding: 0.3rem 0; font-size: 0.9rem; color: #bbb; }
+        .order-item-line .qty { color: var(--primary); font-weight: 600; margin-right: 0.5rem; }
+        .order-footer { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; padding-top: 1rem; border-top: 1px solid rgba(255,255,255,0.06); }
+        .order-total { font-family: 'Playfair Display', serif; font-size: 1.4rem; font-weight: 800; color: var(--primary); }
+        
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; }
+        .card { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.06); border-radius: var(--radius); padding: 2rem; }
+        .card h3 { font-family: 'Playfair Display', serif; font-size: 1.3rem; margin-bottom: 1.5rem; color: var(--primary); display: flex; align-items: center; gap: 0.5rem; }
+        .form-group { margin-bottom: 1.2rem; }
+        .form-group label { display: block; font-size: 0.8rem; font-weight: 700; margin-bottom: 0.4rem; color: #ccc; text-transform: uppercase; letter-spacing: 1px; }
+        .form-group input, .form-group textarea {
+            width: 100%; padding: 0.8rem 1rem; border-radius: 12px;
+            border: 2px solid rgba(255,255,255,0.06); background: rgba(255,255,255,0.05);
+            color: white; font-size: 1rem; font-family: inherit; transition: all 0.3s ease;
+        }
+        .form-group input:focus, .form-group textarea:focus { outline: none; border-color: var(--primary); }
+        .form-group input:disabled { opacity: 0.6; cursor: not-allowed; }
+        
+        /* ==================== ADMIN ==================== */
+        .admin-container { max-width: 1400px; margin: 0 auto; padding: 2rem 1.5rem 4rem; }
+        .admin-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.2rem; margin-bottom: 2rem; }
+        .admin-stat {
+            background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.06);
+            border-radius: var(--radius); padding: 1.5rem; position: relative; overflow: hidden;
+            transition: all 0.3s ease;
+        }
+        .admin-stat:hover { transform: translateY(-4px); border-color: var(--primary); }
+        .admin-stat::before { content: ''; position: absolute; top: 0; left: 0; width: 4px; height: 100%; background: var(--primary); }
+        .admin-stat.blue::before { background: var(--info); }
+        .admin-stat.green::before { background: var(--success); }
+        .admin-stat.gold::before { background: var(--gold); }
+        .admin-stat .icon { font-size: 1.5rem; color: var(--primary); margin-bottom: 0.5rem; }
+        .admin-stat .num { font-family: 'Playfair Display', serif; font-size: 2.2rem; font-weight: 800; line-height: 1; }
+        .admin-stat .lbl { font-size: 0.75rem; color: #888; text-transform: uppercase; letter-spacing: 1px; font-weight: 600; margin-top: 0.4rem; }
+        
+        .admin-tabs { display: flex; gap: 0.5rem; margin-bottom: 2rem; overflow-x: auto; padding-bottom: 0.5rem; scrollbar-width: none; border-bottom: 2px solid rgba(255,255,255,0.06); }
+        .admin-tabs::-webkit-scrollbar { display: none; }
+        .admin-tab {
+            padding: 0.7rem 1.5rem; background: transparent; border: none;
+            color: #888; font-weight: 600; font-size: 0.9rem; cursor: pointer;
+            border-radius: 50px; transition: all 0.3s ease;
+            display: flex; align-items: center; gap: 0.5rem; white-space: nowrap;
+        }
+        .admin-tab:hover { color: white; background: rgba(255,255,255,0.05); }
+        .admin-tab.active { background: var(--primary); color: #1a1a1a; }
+        .admin-panel { display: none; animation: fadeIn 0.4s ease; }
+        .admin-panel.active { display: block; }
+        
+        .top-bar { display: flex; justify-content: space-between; align-items: center; gap: 1rem; margin-bottom: 1.5rem; flex-wrap: wrap; }
+        .top-bar h3 { font-family: 'Playfair Display', serif; font-size: 1.5rem; }
+        
+        .btn-sm { padding: 0.7rem 1.5rem; border-radius: 50px; border: none; font-weight: 700; font-size: 0.9rem; cursor: pointer; transition: all 0.3s ease; display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; }
+        .btn-sm.primary { background: var(--primary); color: #1a1a1a; }
+        .btn-sm.primary:hover { background: var(--primary-dark); transform: translateY(-2px); }
+        .btn-sm.danger { background: rgba(255,71,87,0.15); color: var(--danger); border: 2px solid rgba(255,71,87,0.3); }
+        .btn-sm.danger:hover { background: var(--danger); color: white; }
+        .btn-sm.info { background: rgba(33,150,243,0.15); color: var(--info); border: 2px solid rgba(33,150,243,0.3); }
+        .btn-sm.info:hover { background: var(--info); color: white; }
+        .btn-sm.success { background: rgba(76,175,80,0.15); color: var(--success); border: 2px solid rgba(76,175,80,0.3); }
+        .btn-sm.success:hover { background: var(--success); color: white; }
+        .btn-sm.small { padding: 0.4rem 0.9rem; font-size: 0.8rem; }
+        .btn-sm:disabled { opacity: 0.5; cursor: not-allowed; }
+        
+        .search-input { padding: 0.7rem 1.2rem; border-radius: 50px; border: 2px solid rgba(255,255,255,0.08); background: rgba(255,255,255,0.04); color: white; font-size: 0.9rem; min-width: 250px; font-family: inherit; }
+        .search-input:focus { outline: none; border-color: var(--primary); }
+        
+        .table-wrapper { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.06); border-radius: var(--radius); overflow: hidden; overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; }
+        thead { background: rgba(255,255,255,0.04); }
+        th { padding: 1rem; text-align: left; font-size: 0.75rem; font-weight: 700; color: #888; text-transform: uppercase; letter-spacing: 1px; border-bottom: 1px solid rgba(255,255,255,0.06); white-space: nowrap; }
+        td { padding: 1rem; border-bottom: 1px solid rgba(255,255,255,0.04); font-size: 0.9rem; vertical-align: middle; }
+        tr:last-child td { border-bottom: none; }
+        tr:hover td { background: rgba(255,255,255,0.02); }
+        .order-id-cell { font-family: monospace; font-weight: 700; color: var(--primary); }
+        .status-select { padding: 0.4rem 0.8rem; border-radius: 50px; border: 2px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.05); color: white; font-size: 0.8rem; font-weight: 600; cursor: pointer; font-family: inherit; }
+        .status-select:focus { outline: none; border-color: var(--primary); }
+        .status-select option { background: #1a1a1a; }
+        .badge { padding: 0.3rem 0.8rem; border-radius: 50px; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; display: inline-block; background: rgba(33,150,243,0.15); color: var(--info); }
+        .menu-thumb { width: 60px; height: 60px; border-radius: 12px; object-fit: cover; border: 2px solid rgba(232,168,124,0.2); }
+        
+        /* ==================== MODAL ==================== */
+        .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(10px); z-index: 9999; align-items: center; justify-content: center; padding: 1rem; }
+        .modal-overlay.active { display: flex; }
+        .modal { background: #1a1a1a; border-radius: var(--radius); padding: 2rem; max-width: 600px; width: 100%; border: 1px solid rgba(255,255,255,0.08); position: relative; max-height: 90vh; overflow-y: auto; }
+        .modal .close-x { position: absolute; top: 15px; right: 20px; background: none; border: none; color: #aaa; font-size: 1.5rem; cursor: pointer; }
+        .modal .close-x:hover { color: white; }
+        .modal h3 { font-family: 'Playfair Display', serif; font-size: 1.6rem; margin-bottom: 0.3rem; color: var(--primary); }
+        .modal .modal-sub { color: #888; font-size: 0.9rem; margin-bottom: 1.5rem; }
+        .form-grid-modal { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+        .modal-actions { display: flex; gap: 0.8rem; margin-top: 1.5rem; flex-wrap: wrap; }
+        .modal-actions .btn-sm { flex: 1; min-width: 120px; }
+        
+        .image-upload-area {
+            border: 2px dashed rgba(232,168,124,0.4);
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: rgba(232,168,124,0.05);
+            margin-bottom: 0.5rem;
+        }
+        .image-upload-area:hover {
+            border-color: var(--primary);
+            background: rgba(232,168,124,0.1);
+        }
+        .image-upload-area i {
+            font-size: 2rem;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+        .image-upload-area p {
+            color: #ccc;
+            font-size: 0.9rem;
+        }
+        .image-upload-area small {
+            color: #666;
+            font-size: 0.75rem;
+            display: block;
+            margin-top: 0.3rem;
+        }
+        
+        /* ==================== AUTH MODAL ==================== */
+        .auth-overlay {
+            display: none; position: fixed; inset: 0;
+            background: rgba(0,0,0,0.85); backdrop-filter: blur(10px);
+            z-index: 9999; align-items: center; justify-content: center; padding: 1rem;
+        }
+        .auth-overlay.active { display: flex; }
+        .auth-modal {
+            background: #1a1a1a; border-radius: var(--radius); padding: 2.5rem;
+            max-width: 500px; width: 100%; border: 1px solid rgba(255,255,255,0.06);
+            position: relative; max-height: 90vh; overflow-y: auto;
+        }
+        .auth-modal .close-btn {
+            position: absolute; top: 15px; right: 20px; background: none;
+            border: none; color: #aaa; font-size: 1.5rem; cursor: pointer;
+        }
+        .auth-modal .close-btn:hover { color: white; }
+        .auth-modal h2 { font-family: 'Playfair Display', serif; font-size: 2rem; margin-bottom: 0.5rem; }
+        .auth-modal h2 span { color: var(--primary); }
+        .auth-modal .subtitle { color: #aaa; margin-bottom: 1.5rem; }
+        .auth-submit {
+            width: 100%; padding: 0.9rem; border-radius: 50px;
+            background: var(--primary); color: #1a1a1a; border: none;
+            font-weight: 700; font-size: 1rem; cursor: pointer; transition: all 0.3s ease;
+            margin-top: 0.5rem;
+        }
+        .auth-submit:hover { background: var(--primary-dark); transform: scale(1.02); }
+        .auth-submit:disabled { opacity: 0.5; cursor: not-allowed; }
+        .switch-auth { text-align: center; margin-top: 1.2rem; color: #aaa; }
+        .switch-auth a { color: var(--primary); cursor: pointer; text-decoration: underline; }
+        .error-msg { background: rgba(255,71,87,0.1); color: var(--danger); padding: 0.8rem; border-radius: 8px; margin-bottom: 1rem; display: none; font-size: 0.9rem; }
+        .error-msg.show { display: block; }
+        
+        .order-item-row { display: flex; justify-content: space-between; align-items: center; padding: 0.6rem 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .order-item-row .item-info { flex: 1; }
+        .order-item-row .item-info .name { font-weight: 600; font-size: 0.95rem; }
+        .order-item-row .item-info .qty-price { font-size: 0.8rem; color: #aaa; margin-top: 0.2rem; }
+        .order-item-row .remove-btn { background: rgba(255,71,87,0.1); color: var(--danger); border: none; padding: 0.3rem 0.6rem; border-radius: 8px; cursor: pointer; font-size: 0.8rem; }
+        
+        .order-success { text-align: center; padding: 1rem; }
+        .order-success .success-icon { font-size: 4rem; color: var(--success); animation: bounceIn 0.6s ease; }
+        @keyframes bounceIn { 0% { transform: scale(0); } 50% { transform: scale(1.2); } 100% { transform: scale(1); } }
+        .order-success h3 { font-family: 'Playfair Display', serif; font-size: 1.8rem; margin: 0.5rem 0; }
+        .order-success .order-num {
+            background: rgba(232,168,124,0.15); color: var(--primary);
+            padding: 0.5rem 1rem; border-radius: 50px; font-weight: 700;
+            display: inline-block; margin: 0.5rem 0; font-family: monospace; font-size: 1.1rem;
+        }
+        
+        .payment-options { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 1.5rem 0; }
+        .payment-btn {
+            padding: 1rem; border-radius: 12px; border: 2px solid rgba(255,255,255,0.06);
+            background: rgba(255,255,255,0.03); color: white; cursor: pointer;
+            transition: all 0.3s ease; text-align: center; font-weight: 600;
+        }
+        .payment-btn:hover { border-color: var(--primary); background: rgba(232,168,124,0.1); }
+        .payment-btn.selected { border-color: var(--primary); background: rgba(232,168,124,0.15); }
+        .payment-btn i { font-size: 1.8rem; display: block; margin-bottom: 0.4rem; }
+        .payment-btn small { font-size: 0.7rem; color: #aaa; display: block; margin-top: 0.2rem; }
+        
+        .order-summary { background: rgba(255,255,255,0.03); border-radius: 12px; padding: 1rem; margin: 1rem 0; }
+        .summary-total { display: flex; justify-content: space-between; padding: 0.8rem 0 0.3rem; font-weight: 700; font-size: 1.2rem; color: var(--primary); border-top: 1px solid rgba(255,255,255,0.1); margin-top: 0.5rem; }
+        .summary-sub { display: flex; justify-content: space-between; font-size: 0.9rem; color: #aaa; padding: 0.2rem 0; }
+        
+        .promo-input { display: flex; gap: 0.5rem; margin: 1rem 0; }
+        .promo-input input { flex: 1; }
+        .promo-input button {
+            padding: 0.8rem 1.5rem; border-radius: 12px;
+            background: rgba(232,168,124,0.15); color: var(--primary);
+            border: 2px solid rgba(232,168,124,0.3); cursor: pointer;
+            font-weight: 600; white-space: nowrap;
+        }
+        .promo-input button:hover { background: var(--primary); color: #1a1a1a; }
+        
+        .location-box {
+            background: rgba(33,150,243,0.08);
+            border: 2px solid rgba(33,150,243,0.3);
+            border-radius: 12px;
+            padding: 1rem;
+            margin: 1rem 0;
+        }
+        .location-box .loc-header {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.8rem;
+            font-weight: 600;
+            color: var(--info);
+        }
+        .location-box .loc-status {
+            font-size: 0.85rem;
+            color: #aaa;
+            margin-bottom: 0.8rem;
+        }
+        .location-box .loc-status.success { color: var(--success); }
+        .location-box .loc-status.error { color: var(--danger); }
+        .loc-btn {
+            width: 100%;
+            padding: 0.8rem;
+            border-radius: 12px;
+            background: var(--info);
+            color: white;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            font-size: 0.95rem;
+        }
+        .loc-btn:hover { background: #1976d2; transform: scale(1.02); }
+        .loc-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+        .loc-btn.shared { background: var(--success); }
+        
+        /* ==================== FOOTER ==================== */
+        footer { background: #0a0a0a; color: #aaa; padding: 3rem 2rem 1.5rem; border-top: 2px solid rgba(232,168,124,0.1); }
+        .footer-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 2rem; max-width: 1100px; margin: 0 auto 2rem; }
+        .footer-grid h4 { color: white; font-family: 'Playfair Display', serif; margin-bottom: 0.8rem; }
+        .footer-grid a { color: #aaa; text-decoration: none; display: block; margin-bottom: 0.4rem; transition: color 0.3s ease; cursor: pointer; }
+        .footer-grid a:hover { color: var(--primary); }
+        .footer-bottom { border-top: 1px solid rgba(255,255,255,0.06); padding-top: 1.5rem; text-align: center; font-size: 0.9rem; }
+        .social-icons { display: flex; gap: 1.2rem; justify-content: center; margin-top: 0.8rem; }
+        .social-icons a { color: #aaa; font-size: 1.3rem; transition: all 0.3s ease; }
+        .social-icons a:hover { color: var(--primary); transform: translateY(-3px); }
+        
+        /* ==================== MISC ==================== */
+        .toast {
+            position: fixed; bottom: 110px; right: 30px;
+            background: #1a1a1a; color: #fdf8f3; padding: 1rem 2rem;
+            border-radius: 16px; box-shadow: 0 8px 40px rgba(0,0,0,0.3);
+            z-index: 9997; transform: translateX(120%); transition: transform 0.5s ease;
+            border-left: 4px solid var(--primary); font-weight: 500;
+            display: flex; align-items: center; gap: 0.8rem; max-width: 350px;
+        }
+        .toast.show { transform: translateX(0); }
+        .toast.success { border-left-color: var(--success); }
+        .toast.success i { color: var(--success); }
+        .toast.error { border-left-color: var(--danger); }
+        .toast.error i { color: var(--danger); }
+        .toast i { color: var(--primary); font-size: 1.3rem; flex-shrink: 0; }
+        
+        .empty { text-align: center; padding: 3rem 1rem; }
+        .empty .icon { font-size: 4rem; color: #333; margin-bottom: 1rem; }
+        .empty h3 { font-family: 'Playfair Display', serif; font-size: 1.5rem; margin-bottom: 0.5rem; }
+        .empty p { color: #888; margin-bottom: 1.5rem; }
+        
+        .skeleton { background: linear-gradient(90deg, rgba(255,255,255,0.04) 0%, rgba(255,255,255,0.08) 50%, rgba(255,255,255,0.04) 100%); background-size: 200% 100%; animation: shimmer 1.5s infinite; border-radius: 12px; height: 100px; margin-bottom: 1rem; }
+        @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+        
+        /* ==================== RESPONSIVE ==================== */
+        @media (max-width: 992px) {
+            .contact-wrapper { grid-template-columns: 1fr; }
+            .map-container { height: 300px; }
+            .hero-content h1 { font-size: 3.5rem; }
+        }
+        @media (max-width: 768px) {
+            .hamburger { display: flex; }
+            .page-tabs {
+                position: absolute; top: 100%; left: 0; right: 0;
+                background: rgba(10,10,10,0.98); flex-direction: column;
+                padding: 1.5rem; gap: 0.5rem; display: none;
+                border-bottom: 2px solid rgba(232,168,124,0.1);
+            }
+            .page-tabs.open { display: flex; }
+            .page-tab { width: 100%; justify-content: flex-start; }
+            .hero-content h1 { font-size: 2.8rem; }
+            .hero-content .stats { gap: 1.5rem; }
+            .hero-content .stats .number { font-size: 1.8rem; }
+            .menu-board .section-header h2 { font-size: 2.5rem; }
+            .reviews-page h2, .contact-page h2 { font-size: 2.5rem; }
+            .auth-modal { padding: 1.5rem; margin: 1rem; }
+            .payment-options { grid-template-columns: 1fr; }
+            .whatsapp-float { width: 55px; height: 55px; font-size: 1.8rem; bottom: 20px; right: 20px; }
+            .user-badge .username { display: none; }
+            .form-grid, .form-grid-modal { grid-template-columns: 1fr; }
+            .welcome-card { padding: 1.5rem; }
+            .welcome-card .welcome-text h1 { font-size: 1.7rem; }
+            .big-avatar { width: 70px; height: 70px; font-size: 2rem; }
+            .dashboard-container, .admin-container { padding: 1rem 1rem 3rem; }
+            header { padding: 0.8rem 1rem; }
+            .admin-badge { display: none; }
+            .menu-thumb { width: 45px; height: 45px; }
+        }
+        @media (max-width: 480px) {
+            .hero-content h1 { font-size: 2.2rem; }
+            .hero-content p { font-size: 1rem; }
+            .btn { padding: 0.7rem 1.8rem; font-size: 0.9rem; }
+            .logo { font-size: 1.3rem; }
+            .menu-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ==================== LOADER ==================== -->
+    <div id="loader">
+        <div class="loader-content">
+            <div class="plate-loader">
+                <span class="floating-food">🍕</span>
+                <span class="floating-food">🥗</span>
+                <span class="floating-food">🍖</span>
+                <span class="floating-food">🍰</span>
+                <div class="plate-ring"></div>
+                <div class="plate-ring"></div>
+                <div class="plate-center">🍽️</div>
+            </div>
+            <h2>Kigali Bites</h2>
+            <p id="loaderMsg">Preparing your feast...</p>
+            <div class="loader-progress">
+                <div class="loader-progress-bar" id="loaderBar"></div>
+            </div>
+            <div class="loader-percent" id="loaderPercent">0%</div>
+        </div>
+    </div>
+
+    <!-- ==================== WHATSAPP ==================== -->
+    <a href="https://wa.me/250784051812?text=Hello%20Kigali%20Bites" class="whatsapp-float" target="_blank" rel="noopener">
+        <i class="fab fa-whatsapp"></i>
+    </a>
+
+    <!-- ==================== TOAST ==================== -->
+    <div class="toast" id="toast">
+        <i class="fas fa-check-circle"></i>
+        <span id="toastMsg">Added to cart!</span>
+    </div>
+
+    <!-- ==================== HEADER ==================== -->
+    <header>
+        <div class="logo" onclick="showPage('home')">
+            <i class="fas fa-utensils"></i> Kigali <span>Bites</span>
+            <span class="admin-badge" id="adminBadge" style="display:none;">Admin</span>
+        </div>
+        <nav class="page-tabs" id="pageTabs">
+            <button class="page-tab active" data-page="home" onclick="showPage('home')"><i class="fas fa-home"></i> Home</button>
+            <button class="page-tab" data-page="menu" onclick="showPage('menu')"><i class="fas fa-utensils"></i> Menu</button>
+            <button class="page-tab" data-page="reviews" onclick="showPage('reviews')"><i class="fas fa-star"></i> Reviews</button>
+            <button class="page-tab" data-page="contact" onclick="showPage('contact')"><i class="fas fa-map-marker-alt"></i> Contact</button>
+            <button class="page-tab" data-page="dashboard" id="dashTab" style="display:none;" onclick="showPage('dashboard')"><i class="fas fa-user"></i> My Account</button>
+            <button class="page-tab" data-page="admin" id="adminTab" style="display:none;" onclick="showPage('admin')"><i class="fas fa-shield-alt"></i> Admin</button>
+        </nav>
+        <div class="nav-actions">
+            <button class="auth-btn" id="authBtn" onclick="openAuth('login')"><i class="fas fa-user"></i> Sign In</button>
+            <span class="cart-icon" onclick="openAuth('cart')">
+                <i class="fas fa-shopping-cart"></i>
+                <span class="cart-count" id="cartCount">0</span>
+            </span>
+            <div class="user-badge" id="userBadge">
+                <span class="avatar" id="userAvatar" onclick="showPage('dashboard')">U</span>
+                <button class="logout-btn" onclick="handleLogout()" title="Logout"><i class="fas fa-sign-out-alt"></i></button>
+            </div>
+        </div>
+        <button class="hamburger" onclick="toggleMenu()" aria-label="Menu"><span></span><span></span><span></span></button>
+    </header>
+
+    <!-- ==================== HOME PAGE ==================== -->
+    <div class="page active" id="page-home">
+        <section class="hero">
+            <div class="hero-content">
+                <div class="tagline">✦ Taste the Heart of Rwanda ✦</div>
+                <h1>Welcome to <span>Kigali Bites</span></h1>
+                <p>Delicious food. Fresh ingredients. Great moments.</p>
+                <div class="store-status" id="storeStatus">
+                    <span class="dot"></span>
+                    <span id="storeStatusText">Checking...</span>
+                </div>
+                <div class="btn-group">
+                    <button class="btn btn-primary" onclick="showPage('menu')">🍽️ View Menu</button>
+                    <button class="btn btn-gold" onclick="openAuth('cart')">📱 Order Now</button>
+                    <button class="btn btn-secondary" onclick="openAuth('signup')">👤 Sign Up</button>
+                </div>
+                <div class="stats">
+                    <div><span class="number">50+</span><span class="label">Dishes</span></div>
+                    <div><span class="number">4.9★</span><span class="label">Rating</span></div>
+                    <div><span class="number">2K+</span><span class="label">Happy Customers</span></div>
+                </div>
+            </div>
+        </section>
+        
+        <section class="featured-section">
+            <h2>Today's <span>Featured</span></h2>
+            <p class="subtitle">Our chef's top picks just for you</p>
+            <div class="featured-grid" id="featuredGrid"></div>
+        </section>
+        
+        <section class="why-section">
+            <h2>Why Choose <span style="color: var(--primary);">Kigali Bites</span>?</h2>
+            <div class="why-grid">
+                <div class="why-card"><div class="icon">🌿</div><h3>Fresh Ingredients</h3><p>Sourced daily from local Rwandan farms</p></div>
+                <div class="why-card"><div class="icon">👨‍🍳</div><h3>Expert Chefs</h3><p>Authentic African flavors, masterfully prepared</p></div>
+                <div class="why-card"><div class="icon">🚀</div><h3>Fast Delivery</h3><p>Hot food at your door in 30-45 minutes</p></div>
+                <div class="why-card"><div class="icon">⭐</div><h3>Top Rated</h3><p>4.9 stars from 2,000+ happy customers</p></div>
+            </div>
+        </section>
+    </div>
+
+    <!-- ==================== MENU PAGE ==================== -->
+    <div class="page" id="page-menu">
+        <section class="menu-board">
+            <div class="section-header">
+                <h2>Our <span>Menu</span></h2>
+                <p>Explore our delicious offerings</p>
+            </div>
+            <div class="search-container">
+                <input type="text" id="searchInput" placeholder="🔍 Search dishes..." onkeyup="filterMenu()">
+            </div>
+            <div class="tabs" id="tabsContainer"></div>
+            <div id="menuContainer"></div>
+        </section>
+    </div>
+
+    <!-- ==================== REVIEWS PAGE ==================== -->
+    <div class="page" id="page-reviews">
+        <section class="reviews-page">
+            <h2>What Our <span>Customers</span> Say</h2>
+            <p class="subtitle">Real reviews from real food lovers</p>
+            
+            <div class="review-submit-box" id="reviewSubmitBox">
+                <h3>✍️ Share Your Experience</h3>
+                <p>Rate us and tell others what you think</p>
+                <div class="star-picker" id="starPicker">
+                    <span class="star-pick" data-rating="1">★</span>
+                    <span class="star-pick" data-rating="2">★</span>
+                    <span class="star-pick" data-rating="3">★</span>
+                    <span class="star-pick" data-rating="4">★</span>
+                    <span class="star-pick" data-rating="5">★</span>
+                </div>
+                <textarea id="reviewComment" placeholder="Tell us about your experience..." rows="3"></textarea>
+                <button class="auth-submit" onclick="submitReview()" id="submitReviewBtn">
+                    <i class="fas fa-paper-plane"></i> Submit Review
+                </button>
+                <p style="text-align:center; color:#666; font-size:0.75rem; margin-top:0.8rem;">
+                    <i class="fas fa-info-circle"></i> You need to be signed in to leave a review
+                </p>
+            </div>
+            
+            <div class="reviews-grid" id="reviewsGrid"></div>
+        </section>
+    </div>
+
+    <!-- ==================== CONTACT PAGE ==================== -->
+    <div class="page" id="page-contact">
+        <section class="contact-page">
+            <h2>📍 Find <span>Us</span></h2>
+            <p class="subtitle">Come visit us or get in touch</p>
+            <div class="contact-wrapper">
+                <div class="map-container">
+                    <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3987.488172073699!2d30.104451!3d-1.944073!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x19dca76c7d0b8f0f%3A0x8f5a8e6c0e0b5b9c!2sKigali%20Convention%20Centre!5e0!3m2!1sen!2srw!4v1700000000000" allowfullscreen loading="lazy"></iframe>
+                </div>
+                <div class="contact-info">
+                    <div class="info-item"><i class="fas fa-phone"></i> <div><strong>Call Us</strong><br><span style="color:#aaa;">+250 784 051 812</span></div></div>
+                    <div class="info-item"><i class="fas fa-envelope"></i> <div><strong>Email</strong><br><span style="color:#aaa;">hello@kigalibites.rw</span></div></div>
+                    <div class="info-item"><i class="fas fa-map-marker-alt"></i> <div><strong>Location</strong><br><span style="color:#aaa;">KG 123 St, Kigali, Rwanda</span></div></div>
+                    <div class="info-item"><i class="fas fa-clock"></i> <div><strong>Hours</strong><br><span style="color:#aaa;">Mon-Sun: 7:00 AM - 10:00 PM</span></div></div>
+                    <button class="btn btn-primary" onclick="openAuth('cart')" style="width:fit-content;">📱 Order Now</button>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- ==================== DASHBOARD PAGE ==================== -->
+    <div class="page" id="page-dashboard">
+        <div class="dashboard-container">
+            <div id="dashNotLoggedIn" style="display:none;">
+                <div class="empty">
+                    <div class="icon">🔒</div>
+                    <h3>Please Sign In</h3>
+                    <p>You need to sign in to view your profile.</p>
+                    <button class="btn btn-primary" onclick="openAuth('login')" style="margin-top:1rem;">Sign In</button>
+                </div>
+            </div>
+            
+            <div id="dashContent" style="display:none;">
+                <div class="welcome-card">
+                    <div class="welcome-text">
+                        <div class="tag">Welcome back</div>
+                        <h1>Hello, <span id="dashUserName">User</span> 👋</h1>
+                        <p id="dashUserEmail">user@example.com</p>
+                    </div>
+                    <div class="big-avatar" id="dashBigAvatar">U</div>
+                </div>
+                
+                <div class="stats-grid">
+                    <div class="stat-box"><div class="icon"><i class="fas fa-receipt"></i></div><div class="num" id="statOrders">0</div><div class="lbl">Total Orders</div></div>
+                    <div class="stat-box"><div class="icon"><i class="fas fa-truck"></i></div><div class="num" id="statActive">0</div><div class="lbl">Active</div></div>
+                    <div class="stat-box"><div class="icon"><i class="fas fa-wallet"></i></div><div class="num" id="statSpent">0</div><div class="lbl">RWF Spent</div></div>
+                </div>
+                
+                <div class="dash-tabs">
+                    <button class="dash-tab active" onclick="showDashTab('orders', this)"><i class="fas fa-receipt"></i> My Orders</button>
+                    <button class="dash-tab" onclick="showDashTab('profile', this)"><i class="fas fa-user"></i> Profile</button>
+                </div>
+                
+                <div class="dash-panel active" id="dashPanel-orders">
+                    <div class="order-list" id="dashOrderList">
+                        <div class="skeleton"></div>
+                        <div class="skeleton"></div>
+                    </div>
+                </div>
+                
+                <div class="dash-panel" id="dashPanel-profile">
+                    <div class="form-grid">
+                        <div class="card">
+                            <h3><i class="fas fa-user-edit"></i> Personal Info</h3>
+                            <div class="form-group"><label>Full Name</label><input type="text" id="editName" placeholder="Your name"></div>
+                            <div class="form-group"><label>Email</label><input type="email" id="editEmail" disabled></div>
+                            <div class="form-group"><label>Phone Number</label><input type="tel" id="editPhone" placeholder="+250 78..."></div>
+                            <button class="btn-sm primary" id="saveBtn" onclick="saveProfile()" style="width:100%;"><i class="fas fa-save"></i> Save Changes</button>
+                        </div>
+                        <div class="card">
+                            <h3><i class="fas fa-info-circle"></i> Account Details</h3>
+                            <div class="form-group"><label>Account ID</label><input type="text" id="dashUserId" disabled style="font-family:monospace; font-size:0.8rem;"></div>
+                            <div class="form-group"><label>Member Since</label><input type="text" id="dashMemberSince" disabled></div>
+                            <div class="form-group"><label>Status</label><input type="text" value="✅ Active" disabled></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== ADMIN PAGE ==================== -->
+    <div class="page" id="page-admin">
+        <div class="admin-container">
+            <div id="adminAccessDenied" style="display:none;">
+                <div class="empty">
+                    <div class="icon">🚫</div>
+                    <h3>Access Denied</h3>
+                    <p>You need to be an admin to access this portal.</p>
+                    <p style="font-size:0.85rem; color:#888; margin-top:1rem; padding:1rem; background:rgba(232,168,124,0.08); border-radius:12px; text-align:left; max-width:500px; margin-left:auto; margin-right:auto;">
+                        <strong style="color:var(--primary);">How to become admin:</strong><br>
+                        1. Sign up on the main site<br>
+                        2. Firebase Console → Firestore → <code style="background:rgba(232,168,124,0.15); color:var(--primary); padding:0.1rem 0.4rem; border-radius:4px;">users</code> collection<br>
+                        3. Open your user document<br>
+                        4. Add field: <code style="background:rgba(232,168,124,0.15); color:var(--primary); padding:0.1rem 0.4rem; border-radius:4px;">isAdmin</code> = <code style="background:rgba(232,168,124,0.15); color:var(--primary); padding:0.1rem 0.4rem; border-radius:4px;">true</code><br>
+                        5. Refresh this page
+                    </p>
+                </div>
+            </div>
+            
+            <div id="adminContent" style="display:none;">
+                <h1 style="font-family:'Playfair Display',serif; font-size:2.5rem; margin-bottom:0.3rem;">Admin <span style="color:var(--primary);">Dashboard</span></h1>
+                <p style="color:#888; margin-bottom:2rem;">Manage your restaurant operations</p>
+                
+                <div class="admin-stats">
+                    <div class="admin-stat"><div class="icon"><i class="fas fa-receipt"></i></div><div class="num" id="admTotalOrders">0</div><div class="lbl">Total Orders</div></div>
+                    <div class="admin-stat blue"><div class="icon"><i class="fas fa-clock"></i></div><div class="num" id="admPending">0</div><div class="lbl">Pending</div></div>
+                    <div class="admin-stat green"><div class="icon"><i class="fas fa-wallet"></i></div><div class="num" id="admRevenue">0</div><div class="lbl">RWF Revenue</div></div>
+                    <div class="admin-stat gold"><div class="icon"><i class="fas fa-utensils"></i></div><div class="num" id="admMenuItems">0</div><div class="lbl">Menu Items</div></div>
+                </div>
+                
+                <div class="admin-tabs">
+                    <button class="admin-tab active" onclick="showAdminTab('orders', this)"><i class="fas fa-receipt"></i> Orders</button>
+                    <button class="admin-tab" onclick="showAdminTab('menu', this)"><i class="fas fa-utensils"></i> Menu</button>
+                    <button class="admin-tab" onclick="showAdminTab('reviews', this)"><i class="fas fa-star"></i> Reviews</button>
+                    <button class="admin-tab" onclick="showAdminTab('customers', this)"><i class="fas fa-users"></i> Customers</button>
+                </div>
+                
+                <div class="admin-panel active" id="adminPanel-orders">
+                    <div class="top-bar">
+                        <h3>All Orders</h3>
+                        <input type="text" class="search-input" placeholder="🔍 Search orders..." onkeyup="filterAdminOrders()" id="adminOrderSearch">
+                    </div>
+                    <div class="table-wrapper">
+                        <table>
+                            <thead><tr><th>Order #</th><th>Customer</th><th>Items</th><th>Total</th><th>Status</th><th>Date</th><th>Actions</th></tr></thead>
+                            <tbody id="adminOrdersBody">
+                                <tr><td colspan="7" class="empty"><div class="icon">⏳</div><p>Loading...</p></td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <div class="admin-panel" id="adminPanel-menu">
+                    <div class="top-bar">
+                        <h3>Menu Management</h3>
+                        <div style="display:flex; gap:0.5rem; flex-wrap:wrap;">
+                            <input type="text" class="search-input" placeholder="🔍 Search dishes..." onkeyup="filterAdminMenu()" id="adminMenuSearch">
+                            <button class="btn-sm primary" onclick="openMenuModal()"><i class="fas fa-plus"></i> Add New Dish</button>
+                        </div>
+                    </div>
+                    <div class="table-wrapper">
+                        <table>
+                            <thead><tr><th>Image</th><th>Dish Name</th><th>Category</th><th>Price</th><th>Description</th><th>Actions</th></tr></thead>
+                            <tbody id="adminMenuBody">
+                                <tr><td colspan="6" class="empty"><div class="icon">⏳</div><p>Loading...</p></td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <div class="admin-panel" id="adminPanel-reviews">
+                    <div class="top-bar"><h3>Customer Reviews</h3></div>
+                    <div id="adminReviewsContainer"><div class="empty"><div class="icon">⏳</div><p>Loading...</p></div></div>
+                </div>
+                
+                <div class="admin-panel" id="adminPanel-customers">
+                    <div class="top-bar"><h3>Customers</h3></div>
+                    <div class="table-wrapper">
+                        <table>
+                            <thead><tr><th>Name</th><th>Email</th><th>Phone</th><th>Joined</th></tr></thead>
+                            <tbody id="adminCustomersBody"><tr><td colspan="4" class="empty"><div class="icon">⏳</div><p>Loading...</p></td></tr></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== FOOTER ==================== -->
+    <footer>
+        <div class="footer-grid">
+            <div><h4>🍽️ Kigali Bites</h4><p style="font-size:0.9rem;">Serving delicious moments in Kigali since 2020.</p></div>
+            <div><h4>Quick Links</h4>
+                <a onclick="showPage('home')">Home</a>
+                <a onclick="showPage('menu')">Menu</a>
+                <a onclick="showPage('reviews')">Reviews</a>
+                <a onclick="showPage('contact')">Contact</a>
+            </div>
+            <div><h4>Contact</h4>
+                <a href="tel:+250784051812">+250 784 051 812</a>
+                <a href="mailto:hello@kigalibites.rw">hello@kigalibites.rw</a>
+            </div>
+            <div><h4>Follow Us</h4>
+                <div class="social-icons" style="justify-content:flex-start;">
+                    <a href="https://instagram.com/kigalibites" target="_blank"><i class="fab fa-instagram"></i></a>
+                    <a href="https://facebook.com/kigalibites" target="_blank"><i class="fab fa-facebook"></i></a>
+                    <a href="https://twitter.com/kigalibites" target="_blank"><i class="fab fa-twitter"></i></a>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom"><p>© 2026 Kigali Bites. All rights reserved. Made with ❤️ in Rwanda</p></div>
+    </footer>
+
+    <!-- ==================== AUTH MODAL ==================== -->
+    <div class="auth-overlay" id="authOverlay">
+        <div class="auth-modal">
+            <button class="close-btn" onclick="closeAuth()">✕</button>
+            <div id="authContent"></div>
+        </div>
+    </div>
+
+    <!-- ==================== MENU MODAL (Admin) ==================== -->
+    <div class="modal-overlay" id="menuModal">
+        <div class="modal">
+            <button class="close-x" onclick="closeMenuModal()">✕</button>
+            <h3 id="modalTitle">Add New Dish</h3>
+            <p class="modal-sub" id="modalSub">Create a new menu item</p>
+            <input type="hidden" id="editDocId">
+            
+            <div class="form-grid-modal">
+                <div class="form-group"><label>Dish Name *</label><input type="text" id="dishName" placeholder="Grilled Chicken"></div>
+                <div class="form-group"><label>Category *</label>
+                    <select id="dishCategory" style="width:100%;padding:0.8rem 1rem;border-radius:12px;border:2px solid rgba(255,255,255,0.06);background:rgba(255,255,255,0.05);color:white;font-family:inherit;">
+                        <option value="breakfast">Breakfast</option>
+                        <option value="lunch" selected>Lunch</option>
+                        <option value="dinner">Dinner</option>
+                        <option value="drinks">Drinks</option>
+                        <option value="desserts">Desserts</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="form-grid-modal">
+                <div class="form-group"><label>Price (RWF) *</label><input type="number" id="dishPrice" placeholder="4500"></div>
+                <div class="form-group"><label>Tags (comma separated)</label><input type="text" id="dishTags" placeholder="⭐ Popular, 🌱 Vegetarian"></div>
+            </div>
+            
+            <div class="form-group"><label>Description</label><textarea id="dishDesc" placeholder="Grilled chicken with peri-peri sauce" rows="2"></textarea></div>
+            
+            <div class="form-group">
+                <label>Dish Image *</label>
+                <div class="image-upload-area" onclick="document.getElementById('dishImgFile').click()">
+                    <i class="fas fa-cloud-upload-alt"></i>
+                    <p><strong>Click to upload</strong> from your device</p>
+                    <small>JPG, PNG, WEBP (max 5MB)</small>
+                </div>
+                <input type="file" id="dishImgFile" accept="image/*" style="display:none;" onchange="handleImageUpload(event)">
+                
+                <p style="text-align:center; color:#666; font-size:0.75rem; margin:0.5rem 0;">— OR paste an image URL —</p>
+                
+                <input type="url" id="dishImg" placeholder="https://images.unsplash.com/..." oninput="previewImage()">
+            </div>
+            
+            <div id="imgPreview" style="display:none; margin-top:0.5rem;">
+                <img id="previewImg" style="width:100%; max-height:180px; object-fit:cover; border-radius:12px; border:2px solid rgba(232,168,124,0.3);">
+                <p style="text-align:center; color:#4caf50; font-size:0.8rem; margin-top:0.5rem;" id="uploadStatus"></p>
+            </div>
+            
+            <div class="modal-actions">
+                <button class="btn-sm danger" onclick="closeMenuModal()">Cancel</button>
+                <button class="btn-sm primary" onclick="saveMenuItem()" id="saveMenuBtn"><i class="fas fa-save"></i> Save Dish</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================================
+    FIREBASE SCRIPT
+    ============================================================ -->
+    <script type="module">
+        // ===== FIREBASE SDK =====
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
+        import { 
+            getFirestore, collection, addDoc, getDocs, query, orderBy, 
+            serverTimestamp, doc, setDoc, getDoc, updateDoc, deleteDoc, where 
+        } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
+        import { 
+            getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, 
+            signOut, onAuthStateChanged, updateProfile 
+        } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js";
+        import { 
+            getStorage, ref, uploadBytes, getDownloadURL 
+        } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-storage.js";
+
+        // ===== FIREBASE CONFIG =====
+        const firebaseConfig = {
+            apiKey: "AIzaSyBC9SI_Orr6H9NWjcbwLLtnbQaB_fAUqDo",
+            authDomain: "kigali-bites-43044.firebaseapp.com",
+            projectId: "kigali-bites-43044",
+            storageBucket: "kigali-bites-43044.firebasestorage.app",
+            messagingSenderId: "65107251844",
+            appId: "1:65107251844:web:d6de0cfbc3fd3578a8a8d1",
+            measurementId: "G-HZN1QDS7XZ"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const auth = getAuth(app);
+        const storage = getStorage(app);
+
+        console.log('🔥 Firebase connected to:', firebaseConfig.projectId);
+
+        // ==================== STATE ====================
+        let cart = {};
+        let activeTab = 'all';
+        let menuData = {};
+        let allAdminOrders = [];
+        let allAdminMenu = [];
+        let allAdminReviews = [];
+        let allAdminUsers = [];
+        let currentPaymentMethod = null;
+        let currentDiscount = 0;
+        let isAdmin = false;
+        let currentUser = null;
+        let selectedRating = 0;
+        let selectedImageFile = null;
+        let buyerLocation = null;
+
+        // ==================== PAYPACK CONFIG ====================
+        // Replace this link with the one you generated in the Paypack dashboard
+        const PAYPACK_LINK = 'https://payments.paypack.rw/link/plink_KE8iZJpm6KACgUQP5BWb';
+
+        // ==================== LOADER ====================
+        (function() {
+            const messages = ['Preparing your feast...', 'Firing up the grill...', 'Fresh ingredients incoming...', 'Almost ready...', 'Welcome to Kigali Bites!'];
+            let progress = 0, msgIndex = 0;
+            const bar = document.getElementById('loaderBar');
+            const pct = document.getElementById('loaderPercent');
+            const msg = document.getElementById('loaderMsg');
+            const interval = setInterval(() => {
+                progress += Math.random() * 15 + 5;
+                if (progress >= 100) progress = 100;
+                if (bar) bar.style.width = progress + '%';
+                if (pct) pct.textContent = Math.floor(progress) + '%';
+                const newIdx = Math.floor(progress / 25);
+                if (newIdx !== msgIndex && newIdx < messages.length) {
+                    msgIndex = newIdx;
+                    if (msg) msg.textContent = messages[msgIndex];
+                }
+                if (progress >= 100) {
+                    clearInterval(interval);
+                    setTimeout(() => document.getElementById('loader').classList.add('hidden'), 400);
+                }
+            }, 200);
+        })();
+
+        // ==================== PAGE NAVIGATION ====================
+        window.showPage = function(pageName) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            const page = document.getElementById('page-' + pageName);
+            if (page) page.classList.add('active');
+            document.querySelectorAll('.page-tab').forEach(t => {
+                t.classList.toggle('active', t.dataset.page === pageName);
+            });
+            document.getElementById('pageTabs').classList.remove('open');
+            document.querySelector('.hamburger').classList.remove('active');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            
+            if (pageName === 'dashboard' && currentUser) loadUserDashboard();
+            if (pageName === 'admin' && isAdmin) loadAdminData();
+            if (pageName === 'reviews') loadReviews();
+        };
+
+        // ==================== STORE STATUS ====================
+        function updateStoreStatus() {
+            const hour = new Date().getHours();
+            const isOpen = hour >= 7 && hour < 22;
+            const el = document.getElementById('storeStatus');
+            const txt = document.getElementById('storeStatusText');
+            if (!el) return;
+            el.className = 'store-status ' + (isOpen ? 'open' : 'closed');
+            txt.textContent = isOpen ? '🟢 Open Now' : '🔴 Closed — Opens at 7 AM';
+        }
+        updateStoreStatus();
+
+        // ==================== CART ====================
+        function loadCart() {
+            try {
+                const saved = localStorage.getItem('kigaliCart');
+                cart = saved ? JSON.parse(saved) : {};
+            } catch(e) { cart = {}; }
+            updateCartUI();
+        }
+        function saveCart() {
+            localStorage.setItem('kigaliCart', JSON.stringify(cart));
+            updateCartUI();
+        }
+        function updateCartUI() {
+            const total = Object.values(cart).reduce((s, i) => s + i.qty, 0);
+            const el = document.getElementById('cartCount');
+            if (el) el.textContent = total;
+        }
+        function getCartTotal() {
+            return Object.values(cart).reduce((s, i) => s + i.price * i.qty, 0);
+        }
+        function getCartItemsArray() {
+            return Object.values(cart);
+        }
+        
+        window.addToCart = function(name, price, img) {
+            if (cart[name]) cart[name].qty++;
+            else cart[name] = { name, price, qty: 1, img };
+            saveCart();
+            showToast(`✅ ${name} added!`, 'success');
+            const card = document.querySelector(`.menu-card[data-name="${name}"]`);
+            if (card) {
+                const addBtn = card.querySelector('.add-btn');
+                const qtyCtrl = card.querySelector('.qty-controls');
+                const qtyVal = card.querySelector('.qty-value');
+                if (addBtn && qtyCtrl) {
+                    addBtn.style.display = 'none';
+                    qtyCtrl.classList.add('active');
+                    if (qtyVal) qtyVal.textContent = cart[name].qty;
+                }
+            }
+        };
+        
+        window.increaseQty = function(name) {
+            if (cart[name]) {
+                cart[name].qty++;
+                saveCart();
+                const card = document.querySelector(`.menu-card[data-name="${name}"]`);
+                if (card) card.querySelector('.qty-value').textContent = cart[name].qty;
+            }
+        };
+        
+        window.decreaseQty = function(name) {
+            if (cart[name]) {
+                cart[name].qty--;
+                if (cart[name].qty <= 0) {
+                    delete cart[name];
+                    const card = document.querySelector(`.menu-card[data-name="${name}"]`);
+                    if (card) {
+                        card.querySelector('.qty-controls').classList.remove('active');
+                        card.querySelector('.add-btn').style.display = 'flex';
+                    }
+                } else {
+                    const card = document.querySelector(`.menu-card[data-name="${name}"]`);
+                    if (card) card.querySelector('.qty-value').textContent = cart[name].qty;
+                }
+                saveCart();
+            }
+        };
+        
+        window.removeFromCart = function(name) {
+            delete cart[name];
+            saveCart();
+            openAuth('cart');
+        };
+        
+        loadCart();
+
+        // ==================== TOAST ====================
+        let toastTimeout;
+        window.showToast = function(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            if (!toast) return;
+            document.getElementById('toastMsg').textContent = message;
+            toast.className = 'toast show ' + type;
+            toast.querySelector('i').className = type === 'error' ? 'fas fa-exclamation-circle' : 'fas fa-check-circle';
+            clearTimeout(toastTimeout);
+            toastTimeout = setTimeout(() => toast.classList.remove('show'), 3500);
+        };
+
+        // ==================== FALLBACK MENU ====================
+        const FALLBACK_MENU = {
+            breakfast: [
+                { name: 'Full Rwandan Breakfast', price: 4500, desc: 'Fried plantains, beans, eggs, avocado & bread', tags: ['⭐ Popular', '🌱 Vegetarian'], img: 'https://images.unsplash.com/photo-1533089860892-a7c6f0a88666?w=600&h=400&fit=crop' },
+                { name: 'Honey Pancakes', price: 3200, desc: 'Fluffy pancakes with local honey & berries', tags: ['🍯 Sweet'], img: 'https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=600&h=400&fit=crop' },
+                { name: 'Veggie Omelette', price: 3800, desc: 'Fluffy omelette with peppers, onions & cheese', tags: ['🌱 Vegetarian'], img: 'https://images.unsplash.com/photo-1510693206972-df098062cb71?w=600&h=400&fit=crop' },
+                { name: 'Avocado Toast', price: 2800, desc: 'Sourdough toast with avocado & poached egg', tags: ['🥑 Healthy'], img: 'https://images.unsplash.com/photo-1541519227354-08fa5d50c44d?w=600&h=400&fit=crop' }
+            ],
+            lunch: [
+                { name: 'Grilled Chicken', price: 5500, desc: 'Juicy grilled chicken with peri-peri sauce', tags: ['🔥 Spicy'], img: 'https://images.unsplash.com/photo-1598515214211-89d3c73ae83b?w=600&h=400&fit=crop' },
+                { name: 'Grilled Tilapia', price: 6000, desc: 'Fresh Lake Kivu tilapia with garlic butter', tags: ['🐟 Fresh'], img: 'https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?w=600&h=400&fit=crop' },
+                { name: 'Beef Burger', price: 4800, desc: 'Juicy beef patty with cheddar & sauce', tags: ['🍔 Classic'], img: 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=600&h=400&fit=crop' },
+                { name: 'Caesar Salad', price: 3200, desc: 'Crisp romaine, parmesan & dressing', tags: ['🥗 Healthy'], img: 'https://images.unsplash.com/photo-1550304943-4f24f54ddde9?w=600&h=400&fit=crop' }
+            ],
+            dinner: [
+                { name: 'Brochettes', price: 4500, desc: 'Grilled beef skewers with peanut sauce', tags: ['⭐ Signature'], img: 'https://images.unsplash.com/photo-1529193591184-b1d58069ecdd?w=600&h=400&fit=crop' },
+                { name: 'Isombe', price: 3200, desc: 'Cassava leaves with peanut butter & spinach', tags: ['🇷🇼 Traditional'], img: 'https://images.unsplash.com/photo-1512058564366-18510be2db19?w=600&h=400&fit=crop' },
+                { name: 'Lamb Chops', price: 8500, desc: 'Tender lamb chops with rosemary', tags: ['🥩 Premium'], img: 'https://images.unsplash.com/photo-1544025162-d76694265947?w=600&h=400&fit=crop' },
+                { name: 'Ugali & Fish', price: 5500, desc: 'Traditional Ugali with grilled tilapia', tags: ['🇷🇼 Local'], img: 'https://images.unsplash.com/photo-1604329760661-e71dc83f8f26?w=600&h=400&fit=crop' }
+            ],
+            drinks: [
+                { name: 'Tropical Smoothie', price: 2500, desc: 'Mango, passion fruit & banana', tags: ['🥭 Fresh'], img: 'https://images.unsplash.com/photo-1505252585461-04db1eb84625?w=600&h=400&fit=crop' },
+                { name: 'Fresh Juice', price: 2000, desc: 'Freshly squeezed juice', tags: ['🍊 Natural'], img: 'https://images.unsplash.com/photo-1600271886742-f049cd451bba?w=600&h=400&fit=crop' },
+                { name: 'Rwandan Coffee', price: 1800, desc: 'Premium Rwandan coffee', tags: ['☕ Premium'], img: 'https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?w=600&h=400&fit=crop' },
+                { name: 'Milkshake', price: 2200, desc: 'Creamy milkshake', tags: ['🍦 Sweet'], img: 'https://images.unsplash.com/photo-1572490122747-3968b75cc699?w=600&h=400&fit=crop' }
+            ],
+            desserts: [
+                { name: 'Chocolate Cake', price: 3000, desc: 'Rich chocolate cake with ganache', tags: ['🍫 Sweet'], img: 'https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=600&h=400&fit=crop' },
+                { name: 'Fruit Platter', price: 2500, desc: 'Fresh seasonal fruits', tags: ['🥝 Fresh'], img: 'https://images.unsplash.com/photo-1519996529931-28324d5a630e?w=600&h=400&fit=crop' },
+                { name: 'Ice Cream', price: 1800, desc: 'Creamy ice cream', tags: ['🍦 Sweet'], img: 'https://images.unsplash.com/photo-1567206563064-6f60f40a2b57?w=600&h=400&fit=crop' }
+            ]
+        };
+
+        // ==================== LOAD MENU ====================
+        async function loadMenuFromFirestore() {
+            try {
+                const snap = await getDocs(collection(db, 'menu'));
+                if (!snap.empty) {
+                    const fbMenu = { breakfast: [], lunch: [], dinner: [], drinks: [], desserts: [] };
+                    snap.forEach(d => {
+                        const item = d.data();
+                        const cat = item.category || 'lunch';
+                        if (fbMenu[cat]) fbMenu[cat].push(item);
+                    });
+                    const total = Object.values(fbMenu).reduce((s, arr) => s + arr.length, 0);
+                    if (total > 0) menuData = fbMenu;
+                    else menuData = FALLBACK_MENU;
+                } else {
+                    menuData = FALLBACK_MENU;
+                }
+            } catch(e) {
+                console.warn('Menu fetch failed:', e);
+                menuData = FALLBACK_MENU;
+            }
+            renderTabs();
+            renderMenu();
+            renderFeatured();
+        }
+
+        function renderTabs() {
+            const tabs = document.getElementById('tabsContainer');
+            if (!tabs) return;
+            const cats = ['all', ...Object.keys(menuData).filter(k => menuData[k]?.length)];
+            const labels = { all: '🍽️ All', breakfast: '🍳 Breakfast', lunch: '🥗 Lunch', dinner: '🍖 Dinner', drinks: '🥤 Drinks', desserts: '🍰 Desserts' };
+            tabs.innerHTML = cats.map(cat => 
+                `<button class="tab-btn ${cat === activeTab ? 'active' : ''}" data-tab="${cat}" onclick="switchTab('${cat}')">${labels[cat]}</button>`
+            ).join('');
+        }
+
+        function renderMenu() {
+            const container = document.getElementById('menuContainer');
+            if (!container) return;
+            let html = '';
+            if (activeTab === 'all') {
+                Object.keys(menuData).forEach(cat => {
+                    const items = menuData[cat];
+                    if (!items || !items.length) return;
+                    html += `
+                        <div style="margin-bottom: 3rem;">
+                            <h3 style="font-family:'Playfair Display',serif; font-size:1.8rem; margin-bottom:1.5rem; color: var(--primary);">
+                                ${cat.charAt(0).toUpperCase() + cat.slice(1)}
+                            </h3>
+                            <div class="menu-grid">${items.map(renderMenuCard).join('')}</div>
+                        </div>
+                    `;
+                });
+            } else {
+                const items = menuData[activeTab] || [];
+                html = `<div class="menu-grid">${items.map(renderMenuCard).join('')}</div>`;
+            }
+            container.innerHTML = html;
+            
+            Object.keys(cart).forEach(name => {
+                const card = document.querySelector(`.menu-card[data-name="${name}"]`);
+                if (card) {
+                    const addBtn = card.querySelector('.add-btn');
+                    const qtyCtrl = card.querySelector('.qty-controls');
+                    const qtyVal = card.querySelector('.qty-value');
+                    if (addBtn && qtyCtrl) {
+                        addBtn.style.display = 'none';
+                        qtyCtrl.classList.add('active');
+                        if (qtyVal) qtyVal.textContent = cart[name].qty;
+                    }
+                }
+            });
+        }
+
+        function renderMenuCard(item) {
+            const safeName = (item.name || '').replace(/'/g, "\\'");
+            const img = item.img || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=600&h=400&fit=crop';
+            const tags = Array.isArray(item.tags) ? item.tags : [];
+            return `
+                <div class="menu-card" data-name="${item.name}">
+                    <img src="${img}" alt="${item.name}" class="food-img" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=600&h=400&fit=crop'">
+                    <div class="card-body">
+                        <div class="dish-header">
+                            <span class="dish-name">${item.name}</span>
+                            <span class="price">${(item.price || 0).toLocaleString()} RWF</span>
+                        </div>
+                        <div class="dish-desc">${item.desc || ''}</div>
+                        <div class="dish-tags">${tags.map(t => `<span>${t}</span>`).join('')}</div>
+                        <div class="dish-footer">
+                            <button class="add-btn" onclick="addToCart('${safeName}', ${item.price}, '${img}')">
+                                <i class="fas fa-plus"></i> Add
+                            </button>
+                            <div class="qty-controls">
+                                <button onclick="decreaseQty('${safeName}')">−</button>
+                                <span class="qty-value">1</span>
+                                <button onclick="increaseQty('${safeName}')">+</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        window.switchTab = function(tabName) {
+            activeTab = tabName;
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === tabName));
+            renderMenu();
+        };
+
+        window.filterMenu = function() {
+            const input = document.getElementById('searchInput').value.toLowerCase().trim();
+            document.querySelectorAll('.menu-card').forEach(card => {
+                card.style.display = card.dataset.name.toLowerCase().includes(input) ? '' : 'none';
+            });
+        };
+
+        function renderFeatured() {
+            const container = document.getElementById('featuredGrid');
+            if (!container) return;
+            const featured = [];
+            if (menuData.dinner?.[0]) featured.push(menuData.dinner[0]);
+            if (menuData.lunch?.[0]) featured.push(menuData.lunch[0]);
+            if (menuData.breakfast?.[0]) featured.push(menuData.breakfast[0]);
+            if (menuData.desserts?.[0]) featured.push(menuData.desserts[0]);
+            container.innerHTML = featured.map(item => `
+                <div class="featured-card" onclick="showPage('menu')">
+                    <img src="${item.img}" alt="${item.name}" loading="lazy">
+                    <div class="fc-body">
+                        <h4>${item.name}</h4>
+                        <span class="price">${(item.price || 0).toLocaleString()} RWF</span>
+                        <br>
+                        <button class="order-now">View Menu →</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // ==================== AUTH ====================
+        window.openAuth = function(type) {
+            document.getElementById('authOverlay').classList.add('active');
+            renderAuthContent(type);
+            document.body.style.overflow = 'hidden';
+        };
+        window.closeAuth = function() {
+            document.getElementById('authOverlay').classList.remove('active');
+            document.body.style.overflow = '';
+        };
+
+        function renderAuthContent(type) {
+            const container = document.getElementById('authContent');
+            let html = '';
+            switch(type) {
+                case 'login':
+                    html = `
+                        <h2>Welcome <span>Back</span></h2>
+                        <p class="subtitle">Sign in to access your account</p>
+                        <div id="authError" class="error-msg"></div>
+                        <div class="form-group"><label>Email</label><input type="email" placeholder="you@example.com" id="loginEmail"></div>
+                        <div class="form-group"><label>Password</label><input type="password" placeholder="••••••••" id="loginPassword"></div>
+                        <button class="auth-submit" id="loginBtn" onclick="handleLogin()">Sign In</button>
+                        <div class="switch-auth">Don't have an account? <a onclick="openAuth('signup')">Sign Up</a></div>
+                    `;
+                    break;
+                case 'signup':
+                    html = `
+                        <h2>Create <span>Account</span></h2>
+                        <p class="subtitle">Join the Kigali Bites family</p>
+                        <div id="authError" class="error-msg"></div>
+                        <div class="form-group"><label>Full Name *</label><input type="text" placeholder="Your name" id="signupName"></div>
+                        <div class="form-group"><label>Email *</label><input type="email" placeholder="you@example.com" id="signupEmail"></div>
+                        <div class="form-group"><label>Password * (min 6)</label><input type="password" placeholder="••••••••" id="signupPassword"></div>
+                        <div class="form-group"><label>Phone *</label><input type="tel" placeholder="+250 78..." id="signupPhone"></div>
+                        <button class="auth-submit" id="signupBtn" onclick="handleSignup()">Create Account</button>
+                        <div class="switch-auth">Already have an account? <a onclick="openAuth('login')">Sign In</a></div>
+                    `;
+                    break;
+                case 'cart':
+                    const items = getCartItemsArray();
+                    html = `
+                        <h2>🛒 Your <span>Cart</span></h2>
+                        <p class="subtitle">${items.length ? items.length + ' item(s)' : 'Empty'}</p>
+                        <div class="order-summary">
+                            ${items.length === 0 ? '<p style="text-align:center;color:#666;padding:1rem;">Your cart is empty</p>' :
+                            items.map(item => `
+                                <div class="order-item-row">
+                                    <div class="item-info">
+                                        <div class="name">${item.name}</div>
+                                        <div class="qty-price">${item.qty} × ${item.price.toLocaleString()} RWF</div>
+                                    </div>
+                                    <button class="remove-btn" onclick="removeFromCart('${item.name.replace(/'/g, "\\'")}')">✕</button>
+                                </div>
+                            `).join('') + `<div class="summary-total"><span>Subtotal</span><span>${getCartTotal().toLocaleString()} RWF</span></div>`}
+                        </div>
+                        ${items.length > 0 ? `<button class="auth-submit" onclick="openAuth('checkout')">Checkout →</button>` : `<button class="auth-submit" onclick="closeAuth(); showPage('menu');" style="background:#555;">Browse Menu</button>`}
+                    `;
+                    break;
+                case 'checkout':
+                    html = `
+                        <h2>📦 <span>Checkout</span></h2>
+                        <p class="subtitle">Delivery details</p>
+                        <div id="authError" class="error-msg"></div>
+                        <div class="form-group"><label>Delivery Address *</label><input type="text" placeholder="KG 123 St, Kigali" id="deliveryAddress"></div>
+                        <div class="form-group"><label>Phone *</label><input type="tel" placeholder="+250 78..." id="deliveryPhone"></div>
+                        <div class="form-group"><label>Notes (Optional)</label><textarea rows="2" placeholder="Leave at door" id="deliveryNotes"></textarea></div>
+                        
+                        <div class="location-box">
+                            <div class="loc-header">
+                                <i class="fas fa-map-marked-alt"></i>
+                                <span>Share Your Live Location (Optional)</span>
+                            </div>
+                            <p class="loc-status" id="locStatus">📍 Helps the delivery person find you faster</p>
+                            <button class="loc-btn" id="shareLocBtn" onclick="shareLocation()">
+                                <i class="fas fa-crosshairs"></i> Share My Location
+                            </button>
+                        </div>
+                        
+                        <div class="promo-input"><input type="text" placeholder="Promo code" id="promoCode"><button onclick="applyPromo()">Apply</button></div>
+                        <div class="order-summary">
+                            <div class="summary-sub"><span>Subtotal</span><span>${getCartTotal().toLocaleString()} RWF</span></div>
+                            <div class="summary-sub"><span>Delivery</span><span>1,000 RWF</span></div>
+                            <div class="summary-sub" id="discountRow" style="display:none; color:#4caf50;"><span>Discount</span><span id="discountEl">-0 RWF</span></div>
+                            <div class="summary-total"><span>Total</span><span id="grandTotalEl">${(getCartTotal() + 1000).toLocaleString()} RWF</span></div>
+                        </div>
+                        <button class="auth-submit" onclick="openAuth('payment')">Continue →</button>
+                        <button class="auth-submit" onclick="openAuth('cart')" style="background:#555;">← Back</button>
+                    `;
+                    break;
+                case 'payment':
+                    html = `
+                        <h2>💳 <span>Payment</span></h2>
+                        <p class="subtitle">Choose payment method</p>
+                        <div class="order-summary">
+                            <div class="summary-total"><span>Amount</span><span>${(getCartTotal() + 1000 - currentDiscount).toLocaleString()} RWF</span></div>
+                        </div>
+                        <div class="payment-options">
+                            <button class="payment-btn" onclick="openPaypackLink(this)"><i class="fas fa-mobile-alt"></i> Mobile Money<small>MTN / Airtel</small></button>
+                            <button class="payment-btn" onclick="selectPayment('Credit Card', this)"><i class="fas fa-credit-card"></i> Card<small>Visa / Mastercard</small></button>
+                            <button class="payment-btn" onclick="selectPayment('Bank Transfer', this)"><i class="fas fa-university"></i> Bank<small>Bank of Kigali</small></button>
+                            <button class="payment-btn" onclick="selectPayment('Cash', this)"><i class="fas fa-money-bill-wave"></i> Cash<small>On delivery</small></button>
+                        </div>
+                        <button class="auth-submit" id="payBtn" onclick="processPayment()" disabled><i class="fas fa-lock"></i> Place Order</button>
+                        <button class="auth-submit" onclick="openAuth('checkout')" style="background:#555;">← Back</button>
+                    `;
+                    break;
+                case 'success':
+                    html = `
+                        <div class="order-success">
+                            <div class="success-icon">✅</div>
+                            <h3>Order Received!</h3>
+                            <p style="color:#aaa;">Your order is now being verified</p>
+                            <div class="order-num" id="orderNumDisplay">KB-000000</div>
+                            <div style="background: rgba(255,193,7,0.1); border:2px solid rgba(255,193,7,0.35); border-radius:12px; padding:1rem; margin:1rem 0; text-align:left;">
+                                <p style="color:#ffc107; font-weight:700; font-size:0.9rem; margin-bottom:0.4rem;">⏳ Payment Verification Pending</p>
+                                <p style="color:#ccc; font-size:0.85rem; line-height:1.5;">
+                                    We're confirming your Mobile Money payment. Once verified, your order will be marked as <strong>confirmed</strong> and preparation will begin. This usually takes 1–2 minutes.
+                                </p>
+                            </div>
+                            <p style="color:#aaa; font-size:0.9rem; margin-top:0.5rem;">Delivery in <strong style="color:#e8a87c;">30-45 min</strong> after confirmation</p>
+                            <button class="auth-submit" onclick="closeAuth(); showPage('dashboard');" style="margin-top:1.5rem;"><i class="fas fa-list"></i> Track Order</button>
+                            <button class="auth-submit" onclick="closeAuth(); showPage('home');" style="background:#555; margin-top:0.5rem;"><i class="fas fa-home"></i> Done</button>
+                        </div>
+                    `;
+                    break;
+            }
+            container.innerHTML = html;
+        }
+
+        window.handleLogin = async function() {
+            const email = document.getElementById('loginEmail').value.trim();
+            const password = document.getElementById('loginPassword').value;
+            const errorEl = document.getElementById('authError');
+            const btn = document.getElementById('loginBtn');
+            if (!email || !password) { errorEl.textContent = '❌ Fill all fields'; errorEl.classList.add('show'); return; }
+            try {
+                btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Signing in...';
+                await signInWithEmailAndPassword(auth, email, password);
+                showToast('✅ Welcome back!', 'success');
+                setTimeout(closeAuth, 1000);
+            } catch (error) {
+                errorEl.textContent = '❌ ' + friendlyError(error.code);
+                errorEl.classList.add('show');
+                btn.disabled = false; btn.textContent = 'Sign In';
+            }
+        };
+
+        window.handleSignup = async function() {
+            const name = document.getElementById('signupName').value.trim();
+            const email = document.getElementById('signupEmail').value.trim();
+            const password = document.getElementById('signupPassword').value;
+            const phone = document.getElementById('signupPhone').value.trim();
+            const errorEl = document.getElementById('authError');
+            const btn = document.getElementById('signupBtn');
+            if (!name || !email || !password || !phone) { errorEl.textContent = '❌ Fill all fields'; errorEl.classList.add('show'); return; }
+            if (password.length < 6) { errorEl.textContent = '❌ Password min 6 characters'; errorEl.classList.add('show'); return; }
+            try {
+                btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating...';
+                const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                await updateProfile(userCredential.user, { displayName: name });
+                await setDoc(doc(db, 'users', userCredential.user.uid), { name, email, phone, isAdmin: false, createdAt: serverTimestamp() });
+                showToast('🎉 Account created!', 'success');
+                setTimeout(() => openAuth('login'), 1200);
+            } catch (error) {
+                errorEl.textContent = '❌ ' + friendlyError(error.code);
+                errorEl.classList.add('show');
+                btn.disabled = false; btn.textContent = 'Create Account';
+            }
+        };
+
+        window.handleLogout = async function() {
+            if (!confirm('Logout?')) return;
+            try {
+                await signOut(auth);
+                showToast('👋 Logged out', 'success');
+                setTimeout(() => window.location.reload(), 800);
+            } catch (error) { showToast('❌ Error', 'error'); }
+        };
+
+        function friendlyError(code) {
+            const messages = {
+                'auth/invalid-email': 'Invalid email',
+                'auth/user-not-found': 'No account found',
+                'auth/wrong-password': 'Wrong password',
+                'auth/invalid-credential': 'Wrong email or password',
+                'auth/email-already-in-use': 'Email already in use',
+                'auth/weak-password': 'Password too weak',
+                'auth/too-many-requests': 'Too many tries',
+                'auth/network-request-failed': 'Network error',
+                'auth/configuration-not-found': 'Auth not configured'
+            };
+            return messages[code] || 'Something went wrong';
+        }
+
+        // ==================== SHARE LIVE LOCATION ====================
+        window.shareLocation = function() {
+            const status = document.getElementById('locStatus');
+            const btn = document.getElementById('shareLocBtn');
+            
+            if (!navigator.geolocation) {
+                status.textContent = '❌ Geolocation not supported by your browser';
+                status.className = 'loc-status error';
+                return;
+            }
+            
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Getting location...';
+            status.textContent = '📍 Requesting permission...';
+            status.className = 'loc-status';
+            
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    buyerLocation = {
+                        lat: position.coords.latitude,
+                        lng: position.coords.longitude,
+                        accuracy: position.coords.accuracy,
+                        timestamp: new Date().toISOString()
+                    };
+                    status.innerHTML = `✅ Location shared! (${buyerLocation.lat.toFixed(4)}, ${buyerLocation.lng.toFixed(4)})`;
+                    status.className = 'loc-status success';
+                    btn.innerHTML = '<i class="fas fa-check-circle"></i> Location Shared';
+                    btn.className = 'loc-btn shared';
+                    btn.disabled = false;
+                    showToast('📍 Location shared successfully!', 'success');
+                },
+                (error) => {
+                    let msg = 'Failed to get location';
+                    if (error.code === 1) msg = '❌ Permission denied';
+                    else if (error.code === 2) msg = '❌ Location unavailable';
+                    else if (error.code === 3) msg = '❌ Request timed out';
+                    status.textContent = msg;
+                    status.className = 'loc-status error';
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="fas fa-crosshairs"></i> Try Again';
+                },
+                { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+            );
+        };
+
+        // ==================== CHECKOUT ====================
+        window.applyPromo = function() {
+            const code = document.getElementById('promoCode').value.trim().toUpperCase();
+            const promos = { 'KIGALI10': 10, 'WELCOME': 15, 'NEWYEAR': 20 };
+            if (promos[code]) {
+                const subtotal = getCartTotal();
+                const discount = Math.round(subtotal * promos[code] / 100);
+                currentDiscount = discount;
+                document.getElementById('discountRow').style.display = 'flex';
+                document.getElementById('discountEl').textContent = `-${discount.toLocaleString()} RWF`;
+                document.getElementById('grandTotalEl').textContent = (subtotal + 1000 - discount).toLocaleString() + ' RWF';
+                showToast(`✅ ${promos[code]}% off applied!`, 'success');
+            } else {
+                showToast('❌ Invalid promo code', 'error');
+            }
+        };
+
+        window.selectPayment = function(method, btn) {
+            currentPaymentMethod = method;
+            document.querySelectorAll('.payment-btn').forEach(b => b.classList.remove('selected'));
+            btn.classList.add('selected');
+            document.getElementById('payBtn').disabled = false;
+        };
+
+        // ==================== PAYPACK PAYMENT LINK ====================
+        window.openPaypackLink = function(btn) {
+            const total = getCartTotal() + 1000 - currentDiscount;
+
+            // Mark this button as selected
+            currentPaymentMethod = 'Mobile Money';
+            document.querySelectorAll('.payment-btn').forEach(b => b.classList.remove('selected'));
+            btn.classList.add('selected');
+
+            // Open Paypack payment page in a new tab
+            window.open(PAYPACK_LINK, '_blank');
+
+            // Enable the "Place Order" button
+            document.getElementById('payBtn').disabled = false;
+
+            // Remove old banner if any
+            const existing = document.getElementById('paypackBanner');
+            if (existing) existing.remove();
+
+            // Show instructions banner inside the modal
+            const banner = document.createElement('div');
+            banner.id = 'paypackBanner';
+            banner.style.cssText = `
+                background: rgba(33,150,243,0.12);
+                border: 2px solid rgba(33,150,243,0.4);
+                border-radius: 12px;
+                padding: 1rem 1.2rem;
+                margin: 1rem 0;
+                color: #fff;
+                font-size: 0.9rem;
+                line-height: 1.6;
+            `;
+            banner.innerHTML = `
+                <strong style="color:#2196f3;">📲 Paypack opened in a new tab</strong><br>
+                <span style="color:#ddd;">1. Enter amount: <strong style="color:#e8a87c;">${total.toLocaleString()} RWF</strong></span><br>
+                <span style="color:#ddd;">2. Enter your MTN/Airtel number</span><br>
+                <span style="color:#ddd;">3. Approve the payment on your phone</span><br>
+                <span style="color:#888; font-size:0.8rem; margin-top:0.5rem; display:block;">✅ Then return to this tab and click <strong>Place Order</strong> below.</span>
+            `;
+
+            const payBtn = document.getElementById('payBtn');
+            if (payBtn && payBtn.parentNode) {
+                payBtn.parentNode.insertBefore(banner, payBtn);
+            }
+
+            showToast(`📱 Pay ${total.toLocaleString()} RWF in the Paypack tab`, 'success');
+        };
+
+        window.processPayment = async function() {
+            if (!currentPaymentMethod) { showToast('Select payment method', 'error'); return; }
+            if (!auth.currentUser) { showToast('Please sign in', 'error'); closeAuth(); setTimeout(() => openAuth('login'), 500); return; }
+            const address = document.getElementById('deliveryAddress')?.value || 'Not provided';
+            const phone = document.getElementById('deliveryPhone')?.value || 'Not provided';
+            const notes = document.getElementById('deliveryNotes')?.value || '';
+            const btn = document.getElementById('payBtn');
+            btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+            try {
+                const orderNumber = 'KB-' + Date.now().toString().slice(-6);
+                const subtotal = getCartTotal();
+                const deliveryFee = 1000;
+                await addDoc(collection(db, 'orders'), {
+                    orderNumber, userId: auth.currentUser.uid,
+                    userEmail: auth.currentUser.email,
+                    userName: auth.currentUser.displayName || 'Guest',
+                    userPhone: phone, items: getCartItemsArray(),
+                    subtotal, deliveryFee, discount: currentDiscount,
+                    total: subtotal + deliveryFee - currentDiscount,
+                    deliveryAddress: address, deliveryNotes: notes,
+                    paymentMethod: currentPaymentMethod,
+                    buyerLocation: buyerLocation,
+                    paymentStatus: currentPaymentMethod === 'Mobile Money' ? 'awaiting_confirmation' : 'unpaid',
+                    paymentRef: null,
+                    status: 'pending', createdAt: serverTimestamp()
+                });
+                cart = {}; saveCart();
+                currentPaymentMethod = null; currentDiscount = 0;
+                buyerLocation = null;
+                renderAuthContent('success');
+                document.getElementById('orderNumDisplay').textContent = orderNumber;
+                showToast('🎉 Order placed!', 'success');
+            } catch (error) {
+                console.error(error);
+                showToast('❌ ' + error.message, 'error');
+                btn.disabled = false; btn.innerHTML = '<i class="fas fa-lock"></i> Place Order';
+            }
+        };
+
+        // ==================== AUTH STATE ====================
+        onAuthStateChanged(auth, async (user) => {
+            currentUser = user;
+            const badge = document.getElementById('userBadge');
+            const authBtn = document.getElementById('authBtn');
+            const dashTab = document.getElementById('dashTab');
+            const adminTab = document.getElementById('adminTab');
+            const adminBadge = document.getElementById('adminBadge');
+            
+            if (user) {
+                badge.style.display = 'flex';
+                authBtn.style.display = 'none';
+                if (dashTab) dashTab.style.display = 'flex';
+                document.getElementById('userAvatar').textContent = (user.displayName || user.email || 'U')[0].toUpperCase();
+                
+                try {
+                    const userDoc = await getDoc(doc(db, 'users', user.uid));
+                    isAdmin = userDoc.exists() && userDoc.data().isAdmin === true;
+                    if (isAdmin) {
+                        if (adminTab) adminTab.style.display = 'flex';
+                        if (adminBadge) adminBadge.style.display = 'inline-block';
+                    } else {
+                        if (adminTab) adminTab.style.display = 'none';
+                        if (adminBadge) adminBadge.style.display = 'none';
+                    }
+                } catch(e) { console.warn(e); }
+                
+                loadUserDashboard();
+                if (isAdmin) loadAdminData();
+            } else {
+                badge.style.display = 'none';
+                authBtn.style.display = 'inline-block';
+                if (dashTab) dashTab.style.display = 'none';
+                if (adminTab) adminTab.style.display = 'none';
+                if (adminBadge) adminBadge.style.display = 'none';
+                document.getElementById('dashNotLoggedIn').style.display = 'block';
+                document.getElementById('dashContent').style.display = 'none';
+                isAdmin = false;
+            }
+        });
+
+        // ==================== USER DASHBOARD ====================
+        async function loadUserDashboard() {
+            if (!currentUser) return;
+            document.getElementById('dashNotLoggedIn').style.display = 'none';
+            document.getElementById('dashContent').style.display = 'block';
+            
+            const name = currentUser.displayName || currentUser.email.split('@')[0];
+            document.getElementById('dashUserName').textContent = name;
+            document.getElementById('dashUserEmail').textContent = currentUser.email;
+            document.getElementById('dashBigAvatar').textContent = name[0].toUpperCase();
+            document.getElementById('editName').value = currentUser.displayName || '';
+            document.getElementById('editEmail').value = currentUser.email;
+            document.getElementById('dashUserId').value = currentUser.uid;
+            
+            try {
+                const userDoc = await getDoc(doc(db, 'users', currentUser.uid));
+                if (userDoc.exists()) {
+                    const data = userDoc.data();
+                    if (data.phone) document.getElementById('editPhone').value = data.phone;
+                    if (data.createdAt) {
+                        const date = data.createdAt.toDate ? data.createdAt.toDate() : new Date(data.createdAt);
+                        document.getElementById('dashMemberSince').value = date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+                    }
+                }
+            } catch(e) { console.warn(e); }
+            
+            loadUserOrders();
+        }
+
+        async function loadUserOrders() {
+            if (!currentUser) return;
+            const list = document.getElementById('dashOrderList');
+            list.innerHTML = '<div class="skeleton"></div><div class="skeleton"></div>';
+            try {
+                const q = query(collection(db, 'orders'), where('userId', '==', currentUser.uid));
+                const snapshot = await getDocs(q);
+                const orders = [];
+                snapshot.forEach(d => orders.push({ id: d.id, ...d.data() }));
+                orders.sort((a, b) => {
+                    const at = a.createdAt?.toDate?.() || 0;
+                    const bt = b.createdAt?.toDate?.() || 0;
+                    return bt - at;
+                });
+                
+                const totalSpent = orders.reduce((s, o) => s + (o.total || 0), 0);
+                const activeCount = orders.filter(o => ['pending','confirmed','preparing','ready'].includes(o.status)).length;
+                document.getElementById('statOrders').textContent = orders.length;
+                document.getElementById('statActive').textContent = activeCount;
+                document.getElementById('statSpent').textContent = totalSpent.toLocaleString();
+                
+                if (orders.length === 0) {
+                    list.innerHTML = `
+                        <div class="empty">
+                            <div class="icon">📦</div>
+                            <h3>No orders yet</h3>
+                            <p>Start ordering from our delicious menu</p>
+                            <button class="btn btn-primary" onclick="showPage('menu')" style="margin-top:1rem;">Browse Menu</button>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                const statusLabels = { pending: '⏳ Pending', confirmed: '✅ Confirmed', preparing: '👨‍🍳 Preparing', ready: '🍽️ Ready', delivered: '🚀 Delivered', cancelled: '❌ Cancelled' };
+                
+                list.innerHTML = orders.map(o => {
+                    const status = o.status || 'pending';
+                    const date = o.createdAt?.toDate ? o.createdAt.toDate().toLocaleString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : 'Just now';
+                    const items = Array.isArray(o.items) ? o.items : [];
+                    
+                    let paymentBanner = '';
+                    if (o.paymentStatus === 'awaiting_confirmation') {
+                        paymentBanner = `
+                            <div style="background:rgba(255,193,7,0.1); border-left:3px solid #ffc107; padding:0.6rem 0.8rem; border-radius:8px; margin-bottom:0.8rem; font-size:0.8rem; color:#ffc107;">
+                                <i class="fas fa-hourglass-half"></i> Payment awaiting verification
+                            </div>
+                        `;
+                    } else if (o.paymentStatus === 'paid') {
+                        paymentBanner = `
+                            <div style="background:rgba(76,175,80,0.1); border-left:3px solid #4caf50; padding:0.6rem 0.8rem; border-radius:8px; margin-bottom:0.8rem; font-size:0.8rem; color:#4caf50;">
+                                <i class="fas fa-check-circle"></i> Payment confirmed
+                            </div>
+                        `;
+                    }
+                    
+                    return `
+                        <div class="order-card">
+                            <div class="order-header">
+                                <div>
+                                    <div class="order-id">#${o.orderNumber || o.id.slice(-6).toUpperCase()}</div>
+                                    <div class="order-date">📅 ${date}</div>
+                                </div>
+                                <span class="status-badge ${status}">${statusLabels[status] || status}</span>
+                            </div>
+                            ${paymentBanner}
+                            <div class="order-items">
+                                ${items.map(i => `
+                                    <div class="order-item-line">
+                                        <span><span class="qty">${i.qty || 1}×</span> ${i.name}</span>
+                                        <span>${((i.price || 0) * (i.qty || 1)).toLocaleString()} RWF</span>
+                                    </div>
+                                `).join('')}
+                            </div>
+                            <div class="order-footer">
+                                <div class="order-total">${(o.total || 0).toLocaleString()} RWF</div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            } catch(e) {
+                console.error(e);
+                list.innerHTML = `<div class="empty"><div class="icon">⚠️</div><h3>Error</h3><p>${e.message}</p></div>`;
+            }
+        }
+
+        window.showDashTab = function(name, btn) {
+            document.querySelectorAll('.dash-panel').forEach(p => p.classList.remove('active'));
+            document.getElementById('dashPanel-' + name).classList.add('active');
+            document.querySelectorAll('.dash-tab').forEach(t => t.classList.remove('active'));
+            btn.classList.add('active');
+        };
+
+        window.saveProfile = async function() {
+            if (!currentUser) return;
+            const btn = document.getElementById('saveBtn');
+            btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+            const newName = document.getElementById('editName').value.trim();
+            const newPhone = document.getElementById('editPhone').value.trim();
+            try {
+                if (newName && newName !== currentUser.displayName) {
+                    await updateProfile(currentUser, { displayName: newName });
+                    document.getElementById('dashUserName').textContent = newName;
+                    document.getElementById('dashBigAvatar').textContent = newName[0].toUpperCase();
+                }
+                await updateDoc(doc(db, 'users', currentUser.uid), { name: newName || currentUser.displayName || '', phone: newPhone });
+                showToast('✅ Profile updated!', 'success');
+            } catch(e) {
+                showToast('❌ ' + e.message, 'error');
+            }
+            btn.disabled = false; btn.innerHTML = '<i class="fas fa-save"></i> Save Changes';
+        };
+
+        // ==================== STAR PICKER ====================
+        const starPicker = document.getElementById('starPicker');
+        if (starPicker) {
+            const stars = starPicker.querySelectorAll('.star-pick');
+            stars.forEach(star => {
+                star.addEventListener('mouseenter', () => {
+                    const r = parseInt(star.dataset.rating);
+                    stars.forEach(s => {
+                        s.classList.toggle('hover', parseInt(s.dataset.rating) <= r);
+                    });
+                });
+                star.addEventListener('mouseleave', () => {
+                    stars.forEach(s => s.classList.remove('hover'));
+                });
+                star.addEventListener('click', () => {
+                    selectedRating = parseInt(star.dataset.rating);
+                    stars.forEach(s => {
+                        s.classList.toggle('active', parseInt(s.dataset.rating) <= selectedRating);
+                    });
+                });
+            });
+        }
+
+        // ==================== SUBMIT REVIEW ====================
+        window.submitReview = async function() {
+            if (!currentUser) {
+                showToast('⚠️ Please sign in to leave a review', 'error');
+                openAuth('login');
+                return;
+            }
+            if (!selectedRating) {
+                showToast('⭐ Please select a star rating', 'error');
+                return;
+            }
+            const comment = document.getElementById('reviewComment').value.trim();
+            if (!comment) {
+                showToast('✍️ Please write a comment', 'error');
+                return;
+            }
+            
+            const btn = document.getElementById('submitReviewBtn');
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Submitting...';
+            
+            try {
+                await addDoc(collection(db, 'reviews'), {
+                    userId: currentUser.uid,
+                    userName: currentUser.displayName || currentUser.email.split('@')[0],
+                    userEmail: currentUser.email,
+                    rating: selectedRating,
+                    comment: comment,
+                    location: 'Kigali',
+                    createdAt: serverTimestamp()
+                });
+                
+                showToast('🎉 Thank you for your review!', 'success');
+                
+                document.getElementById('reviewComment').value = '';
+                selectedRating = 0;
+                document.querySelectorAll('.star-pick').forEach(s => s.classList.remove('active'));
+                
+                loadReviews();
+            } catch (error) {
+                console.error(error);
+                showToast('❌ ' + error.message, 'error');
+            }
+            
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fas fa-paper-plane"></i> Submit Review';
+        };
+
+        // ==================== ADMIN ====================
+        async function loadAdminData() {
+            if (!isAdmin) return;
+            document.getElementById('adminAccessDenied').style.display = 'none';
+            document.getElementById('adminContent').style.display = 'block';
+            loadAdminOrders();
+            loadAdminMenu();
+            loadAdminReviews();
+            loadAdminCustomers();
+        }
+
+        async function loadAdminOrders() {
+            try {
+                const q = query(collection(db, 'orders'), orderBy('createdAt', 'desc'));
+                const snap = await getDocs(q);
+                allAdminOrders = [];
+                snap.forEach(d => allAdminOrders.push({ id: d.id, ...d.data() }));
+                document.getElementById('admTotalOrders').textContent = allAdminOrders.length;
+                document.getElementById('admPending').textContent = allAdminOrders.filter(o => o.status === 'pending').length;
+                const revenue = allAdminOrders.filter(o => o.status !== 'cancelled').reduce((s, o) => s + (o.total || 0), 0);
+                document.getElementById('admRevenue').textContent = (revenue/1000).toFixed(0) + 'K';
+                renderAdminOrders(allAdminOrders);
+            } catch(e) {
+                document.getElementById('adminOrdersBody').innerHTML = `<tr><td colspan="7" class="empty"><p>❌ ${e.message}</p></td></tr>`;
+            }
+        }
+
+        function renderAdminOrders(orders) {
+            const tbody = document.getElementById('adminOrdersBody');
+            if (orders.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="7" class="empty"><div class="icon">📦</div><p>No orders yet</p></td></tr>`;
+                return;
+            }
+            tbody.innerHTML = orders.map(o => {
+                const date = o.createdAt?.toDate ? o.createdAt.toDate().toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : 'N/A';
+                const items = (o.items || []).map(i => `${i.qty || 1}× ${i.name}`).join(', ');
+                const locBadge = o.buyerLocation 
+                    ? `<a href="https://www.google.com/maps?q=${o.buyerLocation.lat},${o.buyerLocation.lng}" target="_blank" style="color:var(--info); font-size:0.75rem; text-decoration:none;"><i class="fas fa-map-marker-alt"></i> View Location</a>` 
+                    : '';
+                return `
+                    <tr>
+                        <td class="order-id-cell">#${o.orderNumber || o.id.slice(-6).toUpperCase()}</td>
+                        <td>
+                            <div style="font-weight:600;">${o.userName || 'Guest'}</div>
+                            <div style="font-size:0.75rem; color:#888;">${o.userEmail || ''}</div>
+                            ${locBadge}
+                        </td>
+                        <td><div style="font-size:0.8rem; max-width:200px;">${items}</div></td>
+                        <td style="color:var(--primary); font-weight:700;">${(o.total || 0).toLocaleString()} RWF</td>
+                        <td>
+                            <select class="status-select" onchange="updateAdminOrderStatus('${o.id}', this.value)">
+                                ${['pending','confirmed','preparing','ready','delivered','cancelled'].map(s => `<option value="${s}" ${o.status === s ? 'selected' : ''}>${s}</option>`).join('')}
+                            </select>
+                        </td>
+                        <td style="font-size:0.8rem; color:#888;">${date}</td>
+                        <td>
+                            ${o.paymentStatus === 'awaiting_confirmation' 
+                                ? `<button class="btn-sm success small" onclick="markOrderPaid('${o.id}')" style="margin-right:0.3rem;" title="Mark payment as received"><i class="fas fa-check"></i> Paid</button>` 
+                                : ''}
+                            ${o.paymentStatus === 'paid' 
+                                ? `<span class="badge" style="background:rgba(76,175,80,0.15);color:#4caf50;margin-right:0.3rem;">✅ Paid</span>` 
+                                : ''}
+                            <button class="btn-sm danger small" onclick="deleteAdminOrder('${o.id}')"><i class="fas fa-trash"></i></button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        window.filterAdminOrders = function() {
+            const term = document.getElementById('adminOrderSearch').value.toLowerCase();
+            renderAdminOrders(allAdminOrders.filter(o => 
+                (o.orderNumber || '').toLowerCase().includes(term) ||
+                (o.userEmail || '').toLowerCase().includes(term) ||
+                (o.userName || '').toLowerCase().includes(term)
+            ));
+        };
+
+        window.updateAdminOrderStatus = async function(orderId, newStatus) {
+            try {
+                await updateDoc(doc(db, 'orders', orderId), { status: newStatus });
+                showToast(`✅ Status → "${newStatus}"`, 'success');
+                loadAdminOrders();
+            } catch(e) { showToast('❌ ' + e.message, 'error'); }
+        };
+
+        window.deleteAdminOrder = async function(orderId) {
+            if (!confirm('Delete this order?')) return;
+            try {
+                await deleteDoc(doc(db, 'orders', orderId));
+                showToast('🗑️ Deleted', 'success');
+                loadAdminOrders();
+            } catch(e) { showToast('❌ ' + e.message, 'error'); }
+        };
+
+        window.markOrderPaid = async function(orderId) {
+            if (!confirm('Confirm payment received for this order?')) return;
+            try {
+                await updateDoc(doc(db, 'orders', orderId), {
+                    paymentStatus: 'paid',
+                    status: 'confirmed'
+                });
+                showToast('✅ Marked as paid & confirmed!', 'success');
+                loadAdminOrders();
+            } catch(e) { showToast('❌ ' + e.message, 'error'); }
+        };
+
+        async function loadAdminMenu() {
+            try {
+                const snap = await getDocs(collection(db, 'menu'));
+                allAdminMenu = [];
+                snap.forEach(d => allAdminMenu.push({ id: d.id, ...d.data() }));
+                document.getElementById('admMenuItems').textContent = allAdminMenu.length;
+                renderAdminMenu(allAdminMenu);
+            } catch(e) {
+                document.getElementById('adminMenuBody').innerHTML = `<tr><td colspan="6" class="empty"><p>❌ ${e.message}</p></td></tr>`;
+            }
+        }
+
+        function renderAdminMenu(items) {
+            const tbody = document.getElementById('adminMenuBody');
+            if (items.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" class="empty"><div class="icon">🍽️</div><p>No menu items. Add one!</p></td></tr>`;
+                return;
+            }
+            tbody.innerHTML = items.map(m => `
+                <tr>
+                    <td><img src="${m.img || 'https://via.placeholder.com/60'}" class="menu-thumb" onerror="this.src='https://via.placeholder.com/60'"></td>
+                    <td style="font-weight:600;">${m.name}</td>
+                    <td><span class="badge">${m.category || 'lunch'}</span></td>
+                    <td style="color:var(--primary); font-weight:700;">${(m.price || 0).toLocaleString()} RWF</td>
+                    <td style="font-size:0.85rem; color:#aaa; max-width:250px;">${m.desc || ''}</td>
+                    <td>
+                        <button class="btn-sm info small" onclick="editMenuItem('${m.id}')" style="margin-right:0.3rem;"><i class="fas fa-edit"></i></button>
+                        <button class="btn-sm danger small" onclick="deleteMenuItem('${m.id}', '${(m.name || '').replace(/'/g, "\\'")}')"><i class="fas fa-trash"></i></button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        window.filterAdminMenu = function() {
+            const term = document.getElementById('adminMenuSearch').value.toLowerCase();
+            renderAdminMenu(allAdminMenu.filter(m => 
+                (m.name || '').toLowerCase().includes(term) ||
+                (m.category || '').toLowerCase().includes(term)
+            ));
+        };
+
+        window.showAdminTab = function(name, btn) {
+            document.querySelectorAll('.admin-panel').forEach(p => p.classList.remove('active'));
+            document.getElementById('adminPanel-' + name).classList.add('active');
+            document.querySelectorAll('.admin-tab').forEach(t => t.classList.remove('active'));
+            btn.classList.add('active');
+        };
+
+        window.openMenuModal = function() {
+            document.getElementById('modalTitle').textContent = 'Add New Dish';
+            document.getElementById('modalSub').textContent = 'Create a new menu item';
+            document.getElementById('editDocId').value = '';
+            document.getElementById('dishName').value = '';
+            document.getElementById('dishCategory').value = 'lunch';
+            document.getElementById('dishPrice').value = '';
+            document.getElementById('dishTags').value = '';
+            document.getElementById('dishDesc').value = '';
+            document.getElementById('dishImg').value = '';
+            document.getElementById('imgPreview').style.display = 'none';
+            document.getElementById('uploadStatus').textContent = '';
+            selectedImageFile = null;
+            document.getElementById('menuModal').classList.add('active');
+        };
+
+        window.closeMenuModal = function() {
+            document.getElementById('menuModal').classList.remove('active');
+        };
+
+        window.previewImage = function() {
+            const url = document.getElementById('dishImg').value.trim();
+            if (url) {
+                document.getElementById('previewImg').src = url;
+                document.getElementById('imgPreview').style.display = 'block';
+                document.getElementById('uploadStatus').textContent = '';
+            } else {
+                document.getElementById('imgPreview').style.display = 'none';
+            }
+        };
+
+        window.handleImageUpload = async function(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            if (file.size > 5 * 1024 * 1024) {
+                showToast('❌ Image too large (max 5MB)', 'error');
+                return;
+            }
+            
+            const status = document.getElementById('uploadStatus');
+            status.textContent = '⏳ Uploading...';
+            status.style.color = '#ffc107';
+            
+            try {
+                const filename = `menu/${Date.now()}_${file.name}`;
+                const storageRef = ref(storage, filename);
+                
+                const snapshot = await uploadBytes(storageRef, file);
+                const downloadURL = await getDownloadURL(snapshot.ref);
+                
+                document.getElementById('dishImg').value = downloadURL;
+                document.getElementById('previewImg').src = downloadURL;
+                document.getElementById('imgPreview').style.display = 'block';
+                status.textContent = '✅ Image uploaded successfully!';
+                status.style.color = '#4caf50';
+                
+                showToast('📸 Image uploaded!', 'success');
+            } catch (error) {
+                console.error(error);
+                status.textContent = '❌ Upload failed: ' + error.message;
+                status.style.color = '#ff4757';
+                showToast('❌ Upload failed', 'error');
+            }
+        };
+
+        window.editMenuItem = function(id) {
+            const item = allAdminMenu.find(m => m.id === id);
+            if (!item) return;
+            document.getElementById('modalTitle').textContent = 'Edit Dish';
+            document.getElementById('modalSub').textContent = 'Update menu item';
+            document.getElementById('editDocId').value = id;
+            document.getElementById('dishName').value = item.name || '';
+            document.getElementById('dishCategory').value = item.category || 'lunch';
+            document.getElementById('dishPrice').value = item.price || '';
+            document.getElementById('dishTags').value = Array.isArray(item.tags) ? item.tags.join(', ') : (item.tags || '');
+            document.getElementById('dishDesc').value = item.desc || '';
+            document.getElementById('dishImg').value = item.img || '';
+            document.getElementById('uploadStatus').textContent = '';
+            previewImage();
+            document.getElementById('menuModal').classList.add('active');
+        };
+
+        window.saveMenuItem = async function() {
+            const name = document.getElementById('dishName').value.trim();
+            const category = document.getElementById('dishCategory').value;
+            const price = parseFloat(document.getElementById('dishPrice').value);
+            const tagsStr = document.getElementById('dishTags').value.trim();
+            const desc = document.getElementById('dishDesc').value.trim();
+            const img = document.getElementById('dishImg').value.trim();
+            const editId = document.getElementById('editDocId').value;
+            
+            if (!name || !price || !img) {
+                showToast('❌ Name, Price, Image required', 'error');
+                return;
+            }
+            
+            const tags = tagsStr ? tagsStr.split(',').map(t => t.trim()).filter(Boolean) : [];
+            const data = { name, category, price, desc, img, tags, updatedAt: new Date().toISOString() };
+            
+            const btn = document.getElementById('saveMenuBtn');
+            btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+            
+            try {
+                if (editId) {
+                    await updateDoc(doc(db, 'menu', editId), data);
+                    showToast(`✅ "${name}" updated!`, 'success');
+                } else {
+                    data.createdAt = new Date().toISOString();
+                    await addDoc(collection(db, 'menu'), data);
+                    showToast(`✅ "${name}" added!`, 'success');
+                }
+                closeMenuModal();
+                loadAdminMenu();
+                loadMenuFromFirestore();
+            } catch(e) {
+                showToast('❌ ' + e.message, 'error');
+            }
+            btn.disabled = false; btn.innerHTML = '<i class="fas fa-save"></i> Save Dish';
+        };
+
+        window.deleteMenuItem = async function(id, name) {
+            if (!confirm(`Delete "${name}"?`)) return;
+            try {
+                await deleteDoc(doc(db, 'menu', id));
+                showToast(`🗑️ Deleted`, 'success');
+                loadAdminMenu();
+                loadMenuFromFirestore();
+            } catch(e) { showToast('❌ ' + e.message, 'error'); }
+        };
+
+        async function loadAdminReviews() {
+            try {
+                const q = query(collection(db, 'reviews'), orderBy('createdAt', 'desc'));
+                const snap = await getDocs(q);
+                allAdminReviews = [];
+                snap.forEach(d => allAdminReviews.push({ id: d.id, ...d.data() }));
+                
+                const container = document.getElementById('adminReviewsContainer');
+                if (allAdminReviews.length === 0) {
+                    container.innerHTML = `<div class="empty"><div class="icon">⭐</div><p>No reviews yet</p></div>`;
+                    return;
+                }
+                container.innerHTML = `
+                    <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem;">
+                        ${allAdminReviews.map(r => `
+                            <div style="background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.06); border-radius: 16px; padding: 1.5rem;">
+                                <div style="color: var(--gold); margin-bottom: 0.5rem;">${'★'.repeat(r.rating || 5)}${'☆'.repeat(5 - (r.rating || 5))}</div>
+                                <p style="color: #ddd; margin-bottom: 0.8rem;">"${r.comment || 'No comment'}"</p>
+                                <div style="font-weight:600; font-size:0.9rem;">${r.userName || 'Guest'}</div>
+                                <button class="btn-sm danger small" onclick="deleteAdminReview('${r.id}')" style="margin-top:0.8rem;"><i class="fas fa-trash"></i> Delete</button>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+            } catch(e) {
+                document.getElementById('adminReviewsContainer').innerHTML = `<div class="empty"><p>❌ ${e.message}</p></div>`;
+            }
+        }
+
+        window.deleteAdminReview = async function(id) {
+            if (!confirm('Delete review?')) return;
+            try {
+                await deleteDoc(doc(db, 'reviews', id));
+                showToast('🗑️ Deleted', 'success');
+                loadAdminReviews();
+                loadReviews();
+            } catch(e) { showToast('❌ ' + e.message, 'error'); }
+        };
+
+        async function loadAdminCustomers() {
+            try {
+                const snap = await getDocs(collection(db, 'users'));
+                allAdminUsers = [];
+                snap.forEach(d => allAdminUsers.push({ id: d.id, ...d.data() }));
+                const tbody = document.getElementById('adminCustomersBody');
+                if (allAdminUsers.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="4" class="empty"><p>No customers yet</p></td></tr>`;
+                    return;
+                }
+                tbody.innerHTML = allAdminUsers.map(u => {
+                    const joined = u.createdAt?.toDate ? u.createdAt.toDate().toLocaleDateString() : 'N/A';
+                    return `<tr><td style="font-weight:600;">${u.name || 'Anonymous'}</td><td>${u.email || ''}</td><td>${u.phone || '—'}</td><td>${joined}</td></tr>`;
+                }).join('');
+            } catch(e) {
+                document.getElementById('adminCustomersBody').innerHTML = `<tr><td colspan="4" class="empty"><p>❌ ${e.message}</p></td></tr>`;
+            }
+        }
+
+        // ==================== PUBLIC REVIEWS ====================
+        async function loadReviews() {
+            const grid = document.getElementById('reviewsGrid');
+            if (!grid) return;
+            const defaultReviews = [
+                { rating: 5, comment: "The best brochettes in Kigali!", userName: "Jean Marie", location: "Kigali" },
+                { rating: 5, comment: "I love the Isombe! Tastes like home.", userName: "Aisha K.", location: "Kigali" },
+                { rating: 5, comment: "The grilled tilapia is perfection!", userName: "Sarah M.", location: "Kigali" },
+                { rating: 4, comment: "Great atmosphere and fresh food!", userName: "David R.", location: "Kigali" },
+                { rating: 5, comment: "Ordered delivery and it arrived hot!", userName: "Grace N.", location: "Kigali" },
+                { rating: 5, comment: "The breakfast is amazing!", userName: "Emmanuel K.", location: "Kigali" }
+            ];
+            try {
+                const q = query(collection(db, 'reviews'), orderBy('createdAt', 'desc'));
+                const snapshot = await getDocs(q);
+                const reviews = [];
+                snapshot.forEach(doc => reviews.push(doc.data()));
+                const allReviews = reviews.length > 0 ? reviews : defaultReviews;
+                grid.innerHTML = allReviews.map(r => `
+                    <div class="review-card">
+                        <div class="stars">${'★'.repeat(r.rating || 5)}${'☆'.repeat(5 - (r.rating || 5))}</div>
+                        <p class="review-text">"${r.comment}"</p>
+                        <div class="reviewer">
+                            <span class="avatar">${(r.userName || 'U')[0].toUpperCase()}</span>
+                            <div>
+                                <div>${r.userName || 'Guest'}</div>
+                                <div style="font-size:0.75rem; color:#888; font-weight:400;">📍 ${r.location || 'Kigali'}</div>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+            } catch (e) {
+                grid.innerHTML = defaultReviews.map(r => `
+                    <div class="review-card">
+                        <div class="stars">${'★'.repeat(r.rating)}${'☆'.repeat(5-r.rating)}</div>
+                        <p class="review-text">"${r.comment}"</p>
+                        <div class="reviewer">
+                            <span class="avatar">${r.userName[0]}</span>
+                            <div>
+                                <div>${r.userName}</div>
+                                <div style="font-size:0.75rem; color:#888; font-weight:400;">📍 ${r.location}</div>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+            }
+        }
+
+        // ==================== MOBILE ====================
+        window.toggleMenu = function() {
+            document.getElementById('pageTabs').classList.toggle('open');
+            document.querySelector('.hamburger').classList.toggle('active');
+        };
+
+        document.getElementById('authOverlay').addEventListener('click', (e) => {
+            if (e.target === e.currentTarget) closeAuth();
+        });
+        document.getElementById('menuModal').addEventListener('click', (e) => {
+            if (e.target === e.currentTarget) closeMenuModal();
+        });
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') { closeAuth(); closeMenuModal(); }
+        });
+
+        // ==================== INIT ====================
+        loadMenuFromFirestore();
+        loadReviews();
+        console.log('🚀 Kigali Bites ready!');
+        console.log('💳 Paypack link:', PAYPACK_LINK);
+        console.log('🔥 Connected to Firebase:', firebaseConfig.projectId);
+    </script>
+</body>
+</html>
