@@ -1180,6 +1180,9 @@
         let selectedRating = 0;
         let selectedImageFile = null;
         let buyerLocation = null;
+        let deliveryAddress = '';
+        let deliveryPhone = '';
+        let paypackRequestSucceeded = false;
 
         // ==================== PAYPACK BACKEND ====================
         const PAYPACK_API = 'https://kigali-bites-api.onrender.com/api/paypack/cashin';
@@ -1574,7 +1577,7 @@
                             <div class="summary-sub" id="discountRow" style="display:none; color:#4caf50;"><span>Discount</span><span id="discountEl">-0 RWF</span></div>
                             <div class="summary-total"><span>Total</span><span id="grandTotalEl">${(getCartTotal() + 1000).toLocaleString()} RWF</span></div>
                         </div>
-                        <button class="auth-submit" onclick="openAuth('payment')">Continue →</button>
+                        <button class="auth-submit" onclick="saveCheckoutAndContinue()">Continue →</button>
                         <button class="auth-submit" onclick="openAuth('cart')" style="background:#555;">← Back</button>
                     `;
                     break;
@@ -1617,6 +1620,16 @@
             }
             container.innerHTML = html;
         }
+
+        window.saveCheckoutAndContinue = function() {
+            deliveryAddress = document.getElementById('deliveryAddress')?.value || '';
+            deliveryPhone = document.getElementById('deliveryPhone')?.value || '';
+            if (!deliveryAddress || !deliveryPhone) {
+                showToast('❌ Please fill in your address and phone', 'error');
+                return;
+            }
+            openAuth('payment');
+        };
 
         window.handleLogin = async function() {
             const email = document.getElementById('loginEmail').value.trim();
@@ -1753,10 +1766,9 @@
         // ==================== PAYPACK PAYMENT (via backend) ====================
         window.openPaypackLink = async function(btn) {
             const total = getCartTotal() + 1000 - currentDiscount;
-            const phone = document.getElementById('deliveryPhone')?.value;
 
-            if (!phone) {
-                showToast('❌ Please enter your phone number first', 'error');
+            if (!deliveryPhone) {
+                showToast('❌ Please go back and enter your phone number', 'error');
                 return;
             }
 
@@ -1772,12 +1784,13 @@
                 const response = await fetch(PAYPACK_API, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ phone: phone, amount: total })
+                    body: JSON.stringify({ phone: deliveryPhone, amount: total })
                 });
 
                 const result = await response.json();
 
                 if (result.success) {
+                    paypackRequestSucceeded = true;
                     showToast('📱 Check your phone to approve payment', 'success');
 
                     const existing = document.getElementById('paypackBanner');
@@ -1808,9 +1821,11 @@
                         payBtn.parentNode.insertBefore(banner, payBtn);
                     }
                 } else {
+                    paypackRequestSucceeded = false;
                     showToast('❌ ' + (result.error || 'Payment failed'), 'error');
                 }
             } catch (error) {
+                paypackRequestSucceeded = false;
                 showToast('❌ ' + error.message, 'error');
             }
 
@@ -1821,39 +1836,57 @@
         window.processPayment = async function() {
             if (!currentPaymentMethod) { showToast('Select payment method', 'error'); return; }
             if (!auth.currentUser) { showToast('Please sign in', 'error'); closeAuth(); setTimeout(() => openAuth('login'), 500); return; }
-            const address = document.getElementById('deliveryAddress')?.value || 'Not provided';
-            const phone = document.getElementById('deliveryPhone')?.value || 'Not provided';
-            const notes = document.getElementById('deliveryNotes')?.value || '';
+
             const btn = document.getElementById('payBtn');
             btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+
             try {
                 const orderNumber = 'KB-' + Date.now().toString().slice(-6);
                 const subtotal = getCartTotal();
                 const deliveryFee = 1000;
+
+                let paymentStatus = 'unpaid';
+                if (currentPaymentMethod === 'Mobile Money') {
+                    paymentStatus = paypackRequestSucceeded ? 'awaiting_confirmation' : 'payment_failed';
+                }
+
                 await addDoc(collection(db, 'orders'), {
-                    orderNumber, userId: auth.currentUser.uid,
+                    orderNumber,
+                    userId: auth.currentUser.uid,
                     userEmail: auth.currentUser.email,
                     userName: auth.currentUser.displayName || 'Guest',
-                    userPhone: phone, items: getCartItemsArray(),
-                    subtotal, deliveryFee, discount: currentDiscount,
+                    userPhone: deliveryPhone,
+                    items: getCartItemsArray(),
+                    subtotal, deliveryFee,
+                    discount: currentDiscount,
                     total: subtotal + deliveryFee - currentDiscount,
-                    deliveryAddress: address, deliveryNotes: notes,
+                    deliveryAddress: deliveryAddress,
+                    deliveryNotes: document.getElementById('deliveryNotes')?.value || '',
                     paymentMethod: currentPaymentMethod,
                     buyerLocation: buyerLocation,
-                    paymentStatus: currentPaymentMethod === 'Mobile Money' ? 'awaiting_confirmation' : 'unpaid',
+                    paymentStatus: paymentStatus,
                     paymentRef: null,
-                    status: 'pending', createdAt: serverTimestamp()
+                    status: 'pending',
+                    createdAt: serverTimestamp()
                 });
-                cart = {}; saveCart();
-                currentPaymentMethod = null; currentDiscount = 0;
+
+                cart = {};
+                saveCart();
+                currentPaymentMethod = null;
+                currentDiscount = 0;
                 buyerLocation = null;
+                deliveryAddress = '';
+                deliveryPhone = '';
+                paypackRequestSucceeded = false;
+
                 renderAuthContent('success');
                 document.getElementById('orderNumDisplay').textContent = orderNumber;
                 showToast('🎉 Order placed!', 'success');
             } catch (error) {
                 console.error(error);
                 showToast('❌ ' + error.message, 'error');
-                btn.disabled = false; btn.innerHTML = '<i class="fas fa-lock"></i> Place Order';
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-lock"></i> Place Order';
             }
         };
 
