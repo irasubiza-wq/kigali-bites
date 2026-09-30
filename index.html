@@ -12,7 +12,6 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     
     <style>
-        /* ==================== BASE ==================== */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         :root {
             --primary: #e8a87c; --primary-dark: #d4956b;
@@ -24,7 +23,6 @@
         body { font-family: 'Inter', sans-serif; background: #0a0a0a; color: #fff; overflow-x: hidden; min-height: 100vh; }
         button { font-family: inherit; }
         
-        /* ==================== LOADER ==================== */
         #loader {
             position: fixed; inset: 0; z-index: 99999;
             background: radial-gradient(circle at center, #1a1208 0%, #0a0a0a 70%);
@@ -76,7 +74,6 @@
         .floating-food:nth-child(4) { bottom: 5%; right: 20%; animation-delay: 4.5s; }
         @keyframes orbitFood { 0%, 100% { transform: translateY(0) rotate(0deg); opacity: 0.4; } 50% { transform: translateY(-20px) rotate(15deg); opacity: 0.8; } }
         
-        /* ==================== WHATSAPP ==================== */
         .whatsapp-float {
             position: fixed; bottom: 25px; right: 25px; z-index: 9998;
             background: #25D366; color: white; width: 65px; height: 65px;
@@ -88,7 +85,6 @@
         .whatsapp-float:hover { transform: scale(1.12) rotate(-5deg); }
         @keyframes whatsappPulse { 0%,100% { box-shadow: 0 8px 35px rgba(37,211,102,0.4); } 50% { box-shadow: 0 8px 55px rgba(37,211,102,0.7); } }
         
-        /* ==================== HEADER ==================== */
         header {
             background: rgba(10,10,10,0.92); backdrop-filter: blur(20px);
             padding: 0.8rem 2rem; display: flex; justify-content: space-between;
@@ -137,12 +133,10 @@
         .hamburger.active span:nth-child(2) { opacity: 0; }
         .hamburger.active span:nth-child(3) { transform: rotate(-45deg) translate(5px,-5px); }
         
-        /* ==================== PAGES ==================== */
         .page { display: none; min-height: calc(100vh - 60px); animation: pageIn 0.4s ease; }
         .page.active { display: block; }
         @keyframes pageIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
         
-        /* ==================== HOME ==================== */
         .hero {
             min-height: 90vh;
             background: linear-gradient(rgba(0,0,0,0.55), rgba(0,0,0,0.75)),
@@ -211,7 +205,6 @@
         .why-card h3 { font-size: 1.15rem; margin-bottom: 0.5rem; font-family: 'Playfair Display', serif; }
         .why-card p { color: #aaa; font-size: 0.9rem; }
         
-        /* ==================== MENU ==================== */
         .menu-board {
             padding: 4rem 2rem;
             background: linear-gradient(rgba(0,0,0,0.85), rgba(0,0,0,0.9)),
@@ -275,7 +268,6 @@
         .qty-controls button:hover { background: var(--primary-dark); transform: scale(1.1); }
         .qty-controls .qty-value { flex: 1; text-align: center; font-weight: 700; color: var(--primary); font-size: 1rem; }
         
-        /* ==================== REVIEWS ==================== */
         .reviews-page {
             padding: 5rem 2rem;
             background: linear-gradient(rgba(0,0,0,0.85), rgba(0,0,0,0.9)),
@@ -357,7 +349,6 @@
             font-weight: 700; color: #1a1a1a; font-size: 1.1rem;
         }
         
-        /* ==================== CONTACT ==================== */
         .contact-page { padding: 5rem 2rem; background: #0a0a0a; min-height: 100vh; }
         .contact-page h2 { font-family: 'Playfair Display', serif; font-size: 3.5rem; text-align: center; }
         .contact-page h2 span { color: var(--primary); }
@@ -377,7 +368,6 @@
             font-size: 1.1rem;
         }
         
-        /* ==================== DASHBOARD ==================== */
         .dashboard-container { max-width: 1200px; margin: 0 auto; padding: 2rem 1.5rem 4rem; }
         .welcome-card {
             background: linear-gradient(135deg, #2d1b14 0%, #4a2c1e 100%);
@@ -462,7 +452,6 @@
         .form-group input:focus, .form-group textarea:focus { outline: none; border-color: var(--primary); }
         .form-group input:disabled { opacity: 0.6; cursor: not-allowed; }
         
-        /* ==================== ADMIN ==================== */
         .admin-container { max-width: 1400px; margin: 0 auto; padding: 2rem 1.5rem 4rem; }
         .admin-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.2rem; margin-bottom: 2rem; }
         .admin-stat {
@@ -524,7 +513,6 @@
         .badge { padding: 0.3rem 0.8rem; border-radius: 50px; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; display: inline-block; background: rgba(33,150,243,0.15); color: var(--info); }
         .menu-thumb { width: 60px; height: 60px; border-radius: 12px; object-fit: cover; border: 2px solid rgba(232,168,124,0.2); }
         
-        /* ==================== MODAL ==================== */
         .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(10px); z-index: 9999; align-items: center; justify-content: center; padding: 1rem; }
         .modal-overlay.active { display: flex; }
         .modal { background: #1a1a1a; border-radius: var(--radius); padding: 2rem; max-width: 600px; width: 100%; border: 1px solid rgba(255,255,255,0.08); position: relative; max-height: 90vh; overflow-y: auto; }
@@ -567,7 +555,6 @@
             margin-top: 0.3rem;
         }
         
-        /* ==================== AUTH MODAL ==================== */
         .auth-overlay {
             display: none; position: fixed; inset: 0;
             background: rgba(0,0,0,0.85); backdrop-filter: blur(10px);
@@ -683,7 +670,6 @@
         .loc-btn:disabled { opacity: 0.6; cursor: not-allowed; }
         .loc-btn.shared { background: var(--success); }
         
-        /* ==================== FOOTER ==================== */
         footer { background: #0a0a0a; color: #aaa; padding: 3rem 2rem 1.5rem; border-top: 2px solid rgba(232,168,124,0.1); }
         .footer-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 2rem; max-width: 1100px; margin: 0 auto 2rem; }
         .footer-grid h4 { color: white; font-family: 'Playfair Display', serif; margin-bottom: 0.8rem; }
@@ -694,7 +680,6 @@
         .social-icons a { color: #aaa; font-size: 1.3rem; transition: all 0.3s ease; }
         .social-icons a:hover { color: var(--primary); transform: translateY(-3px); }
         
-        /* ==================== MISC ==================== */
         .toast {
             position: fixed; bottom: 110px; right: 30px;
             background: #1a1a1a; color: #fdf8f3; padding: 1rem 2rem;
@@ -718,7 +703,6 @@
         .skeleton { background: linear-gradient(90deg, rgba(255,255,255,0.04) 0%, rgba(255,255,255,0.08) 50%, rgba(255,255,255,0.04) 100%); background-size: 200% 100%; animation: shimmer 1.5s infinite; border-radius: 12px; height: 100px; margin-bottom: 1rem; }
         @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
         
-        /* ==================== RESPONSIVE ==================== */
         @media (max-width: 992px) {
             .contact-wrapper { grid-template-columns: 1fr; }
             .map-container { height: 300px; }
@@ -763,7 +747,6 @@
 </head>
 <body>
 
-    <!-- ==================== LOADER ==================== -->
     <div id="loader">
         <div class="loader-content">
             <div class="plate-loader">
@@ -784,18 +767,15 @@
         </div>
     </div>
 
-    <!-- ==================== WHATSAPP ==================== -->
     <a href="https://wa.me/250784051812?text=Hello%20Kigali%20Bites" class="whatsapp-float" target="_blank" rel="noopener">
         <i class="fab fa-whatsapp"></i>
     </a>
 
-    <!-- ==================== TOAST ==================== -->
     <div class="toast" id="toast">
         <i class="fas fa-check-circle"></i>
         <span id="toastMsg">Added to cart!</span>
     </div>
 
-    <!-- ==================== HEADER ==================== -->
     <header>
         <div class="logo" onclick="showPage('home')">
             <i class="fas fa-utensils"></i> Kigali <span>Bites</span>
@@ -823,7 +803,6 @@
         <button class="hamburger" onclick="toggleMenu()" aria-label="Menu"><span></span><span></span><span></span></button>
     </header>
 
-    <!-- ==================== HOME PAGE ==================== -->
     <div class="page active" id="page-home">
         <section class="hero">
             <div class="hero-content">
@@ -864,7 +843,6 @@
         </section>
     </div>
 
-    <!-- ==================== MENU PAGE ==================== -->
     <div class="page" id="page-menu">
         <section class="menu-board">
             <div class="section-header">
@@ -879,7 +857,6 @@
         </section>
     </div>
 
-    <!-- ==================== REVIEWS PAGE ==================== -->
     <div class="page" id="page-reviews">
         <section class="reviews-page">
             <h2>What Our <span>Customers</span> Say</h2>
@@ -908,7 +885,6 @@
         </section>
     </div>
 
-    <!-- ==================== CONTACT PAGE ==================== -->
     <div class="page" id="page-contact">
         <section class="contact-page">
             <h2>📍 Find <span>Us</span></h2>
@@ -928,7 +904,6 @@
         </section>
     </div>
 
-    <!-- ==================== DASHBOARD PAGE ==================== -->
     <div class="page" id="page-dashboard">
         <div class="dashboard-container">
             <div id="dashNotLoggedIn" style="display:none;">
@@ -989,7 +964,6 @@
         </div>
     </div>
 
-    <!-- ==================== ADMIN PAGE ==================== -->
     <div class="page" id="page-admin">
         <div class="admin-container">
             <div id="adminAccessDenied" style="display:none;">
@@ -1077,7 +1051,6 @@
         </div>
     </div>
 
-    <!-- ==================== FOOTER ==================== -->
     <footer>
         <div class="footer-grid">
             <div><h4>🍽️ Kigali Bites</h4><p style="font-size:0.9rem;">Serving delicious moments in Kigali since 2020.</p></div>
@@ -1102,7 +1075,6 @@
         <div class="footer-bottom"><p>© 2026 Kigali Bites. All rights reserved. Made with ❤️ in Rwanda</p></div>
     </footer>
 
-    <!-- ==================== AUTH MODAL ==================== -->
     <div class="auth-overlay" id="authOverlay">
         <div class="auth-modal">
             <button class="close-btn" onclick="closeAuth()">✕</button>
@@ -1110,7 +1082,6 @@
         </div>
     </div>
 
-    <!-- ==================== MENU MODAL (Admin) ==================== -->
     <div class="modal-overlay" id="menuModal">
         <div class="modal">
             <button class="close-x" onclick="closeMenuModal()">✕</button>
@@ -1164,11 +1135,7 @@
         </div>
     </div>
 
-    <!-- ============================================================
-    FIREBASE SCRIPT
-    ============================================================ -->
     <script type="module">
-        // ===== FIREBASE SDK =====
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
         import { 
             getFirestore, collection, addDoc, getDocs, query, orderBy, 
@@ -1182,7 +1149,6 @@
             getStorage, ref, uploadBytes, getDownloadURL 
         } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-storage.js";
 
-        // ===== FIREBASE CONFIG =====
         const firebaseConfig = {
             apiKey: "AIzaSyBC9SI_Orr6H9NWjcbwLLtnbQaB_fAUqDo",
             authDomain: "kigali-bites-43044.firebaseapp.com",
@@ -1200,7 +1166,6 @@
 
         console.log('🔥 Firebase connected to:', firebaseConfig.projectId);
 
-        // ==================== STATE ====================
         let cart = {};
         let activeTab = 'all';
         let menuData = {};
@@ -1216,11 +1181,9 @@
         let selectedImageFile = null;
         let buyerLocation = null;
 
-        // ==================== PAYPACK CONFIG ====================
-        // Replace this link with the one you generated in the Paypack dashboard
-        const PAYPACK_LINK = 'https://payments.paypack.rw/link/plink_KE8iZJpm6KACgUQP5BWb';
+        // ==================== PAYPACK BACKEND ====================
+        const PAYPACK_API = 'https://kigali-bites-api.onrender.com/api/paypack/cashin';
 
-        // ==================== LOADER ====================
         (function() {
             const messages = ['Preparing your feast...', 'Firing up the grill...', 'Fresh ingredients incoming...', 'Almost ready...', 'Welcome to Kigali Bites!'];
             let progress = 0, msgIndex = 0;
@@ -1244,7 +1207,6 @@
             }, 200);
         })();
 
-        // ==================== PAGE NAVIGATION ====================
         window.showPage = function(pageName) {
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
             const page = document.getElementById('page-' + pageName);
@@ -1261,7 +1223,6 @@
             if (pageName === 'reviews') loadReviews();
         };
 
-        // ==================== STORE STATUS ====================
         function updateStoreStatus() {
             const hour = new Date().getHours();
             const isOpen = hour >= 7 && hour < 22;
@@ -1273,7 +1234,6 @@
         }
         updateStoreStatus();
 
-        // ==================== CART ====================
         function loadCart() {
             try {
                 const saved = localStorage.getItem('kigaliCart');
@@ -1350,7 +1310,6 @@
         
         loadCart();
 
-        // ==================== TOAST ====================
         let toastTimeout;
         window.showToast = function(message, type = 'success') {
             const toast = document.getElementById('toast');
@@ -1362,7 +1321,6 @@
             toastTimeout = setTimeout(() => toast.classList.remove('show'), 3500);
         };
 
-        // ==================== FALLBACK MENU ====================
         const FALLBACK_MENU = {
             breakfast: [
                 { name: 'Full Rwandan Breakfast', price: 4500, desc: 'Fried plantains, beans, eggs, avocado & bread', tags: ['⭐ Popular', '🌱 Vegetarian'], img: 'https://images.unsplash.com/photo-1533089860892-a7c6f0a88666?w=600&h=400&fit=crop' },
@@ -1395,7 +1353,6 @@
             ]
         };
 
-        // ==================== LOAD MENU ====================
         async function loadMenuFromFirestore() {
             try {
                 const snap = await getDocs(collection(db, 'menu'));
@@ -1532,7 +1489,6 @@
             `).join('');
         }
 
-        // ==================== AUTH ====================
         window.openAuth = function(type) {
             document.getElementById('authOverlay').classList.add('active');
             renderAuthContent(type);
@@ -1727,7 +1683,6 @@
             return messages[code] || 'Something went wrong';
         }
 
-        // ==================== SHARE LIVE LOCATION ====================
         window.shareLocation = function() {
             const status = document.getElementById('locStatus');
             const btn = document.getElementById('shareLocBtn');
@@ -1772,7 +1727,6 @@
             );
         };
 
-        // ==================== CHECKOUT ====================
         window.applyPromo = function() {
             const code = document.getElementById('promoCode').value.trim().toUpperCase();
             const promos = { 'KIGALI10': 10, 'WELCOME': 15, 'NEWYEAR': 20 };
@@ -1796,52 +1750,72 @@
             document.getElementById('payBtn').disabled = false;
         };
 
-        // ==================== PAYPACK PAYMENT LINK ====================
-        window.openPaypackLink = function(btn) {
+        // ==================== PAYPACK PAYMENT (via backend) ====================
+        window.openPaypackLink = async function(btn) {
             const total = getCartTotal() + 1000 - currentDiscount;
+            const phone = document.getElementById('deliveryPhone')?.value;
 
-            // Mark this button as selected
+            if (!phone) {
+                showToast('❌ Please enter your phone number first', 'error');
+                return;
+            }
+
             currentPaymentMethod = 'Mobile Money';
             document.querySelectorAll('.payment-btn').forEach(b => b.classList.remove('selected'));
             btn.classList.add('selected');
-
-            // Open Paypack payment page in a new tab
-            window.open(PAYPACK_LINK, '_blank');
-
-            // Enable the "Place Order" button
             document.getElementById('payBtn').disabled = false;
 
-            // Remove old banner if any
-            const existing = document.getElementById('paypackBanner');
-            if (existing) existing.remove();
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
 
-            // Show instructions banner inside the modal
-            const banner = document.createElement('div');
-            banner.id = 'paypackBanner';
-            banner.style.cssText = `
-                background: rgba(33,150,243,0.12);
-                border: 2px solid rgba(33,150,243,0.4);
-                border-radius: 12px;
-                padding: 1rem 1.2rem;
-                margin: 1rem 0;
-                color: #fff;
-                font-size: 0.9rem;
-                line-height: 1.6;
-            `;
-            banner.innerHTML = `
-                <strong style="color:#2196f3;">📲 Paypack opened in a new tab</strong><br>
-                <span style="color:#ddd;">1. Enter amount: <strong style="color:#e8a87c;">${total.toLocaleString()} RWF</strong></span><br>
-                <span style="color:#ddd;">2. Enter your MTN/Airtel number</span><br>
-                <span style="color:#ddd;">3. Approve the payment on your phone</span><br>
-                <span style="color:#888; font-size:0.8rem; margin-top:0.5rem; display:block;">✅ Then return to this tab and click <strong>Place Order</strong> below.</span>
-            `;
+            try {
+                const response = await fetch(PAYPACK_API, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ phone: phone, amount: total })
+                });
 
-            const payBtn = document.getElementById('payBtn');
-            if (payBtn && payBtn.parentNode) {
-                payBtn.parentNode.insertBefore(banner, payBtn);
+                const result = await response.json();
+
+                if (result.success) {
+                    showToast('📱 Check your phone to approve payment', 'success');
+
+                    const existing = document.getElementById('paypackBanner');
+                    if (existing) existing.remove();
+
+                    const banner = document.createElement('div');
+                    banner.id = 'paypackBanner';
+                    banner.style.cssText = `
+                        background: rgba(33,150,243,0.12);
+                        border: 2px solid rgba(33,150,243,0.4);
+                        border-radius: 12px;
+                        padding: 1rem 1.2rem;
+                        margin: 1rem 0;
+                        color: #fff;
+                        font-size: 0.9rem;
+                        line-height: 1.6;
+                    `;
+                    banner.innerHTML = `
+                        <strong style="color:#2196f3;">📱 Payment request sent!</strong><br>
+                        <span style="color:#ddd;">Amount: <strong style="color:#e8a87c;">${total.toLocaleString()} RWF</strong></span><br>
+                        <span style="color:#ddd;">Check your phone for the MTN/Airtel prompt</span><br>
+                        <span style="color:#ddd;">Enter your MoMo PIN to approve</span><br>
+                        <span style="color:#888; font-size:0.8rem; margin-top:0.5rem; display:block;">✅ Then click <strong>Place Order</strong> below.</span>
+                    `;
+
+                    const payBtn = document.getElementById('payBtn');
+                    if (payBtn && payBtn.parentNode) {
+                        payBtn.parentNode.insertBefore(banner, payBtn);
+                    }
+                } else {
+                    showToast('❌ ' + (result.error || 'Payment failed'), 'error');
+                }
+            } catch (error) {
+                showToast('❌ ' + error.message, 'error');
             }
 
-            showToast(`📱 Pay ${total.toLocaleString()} RWF in the Paypack tab`, 'success');
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fas fa-mobile-alt"></i> Mobile Money<small>MTN / Airtel</small>';
         };
 
         window.processPayment = async function() {
@@ -1883,7 +1857,6 @@
             }
         };
 
-        // ==================== AUTH STATE ====================
         onAuthStateChanged(auth, async (user) => {
             currentUser = user;
             const badge = document.getElementById('userBadge');
@@ -1924,7 +1897,6 @@
             }
         });
 
-        // ==================== USER DASHBOARD ====================
         async function loadUserDashboard() {
             if (!currentUser) return;
             document.getElementById('dashNotLoggedIn').style.display = 'none';
@@ -2065,7 +2037,6 @@
             btn.disabled = false; btn.innerHTML = '<i class="fas fa-save"></i> Save Changes';
         };
 
-        // ==================== STAR PICKER ====================
         const starPicker = document.getElementById('starPicker');
         if (starPicker) {
             const stars = starPicker.querySelectorAll('.star-pick');
@@ -2088,7 +2059,6 @@
             });
         }
 
-        // ==================== SUBMIT REVIEW ====================
         window.submitReview = async function() {
             if (!currentUser) {
                 showToast('⚠️ Please sign in to leave a review', 'error');
@@ -2136,7 +2106,6 @@
             btn.innerHTML = '<i class="fas fa-paper-plane"></i> Submit Review';
         };
 
-        // ==================== ADMIN ====================
         async function loadAdminData() {
             if (!isAdmin) return;
             document.getElementById('adminAccessDenied').style.display = 'none';
@@ -2480,7 +2449,6 @@
             }
         }
 
-        // ==================== PUBLIC REVIEWS ====================
         async function loadReviews() {
             const grid = document.getElementById('reviewsGrid');
             if (!grid) return;
@@ -2528,7 +2496,6 @@
             }
         }
 
-        // ==================== MOBILE ====================
         window.toggleMenu = function() {
             document.getElementById('pageTabs').classList.toggle('open');
             document.querySelector('.hamburger').classList.toggle('active');
@@ -2544,11 +2511,10 @@
             if (e.key === 'Escape') { closeAuth(); closeMenuModal(); }
         });
 
-        // ==================== INIT ====================
         loadMenuFromFirestore();
         loadReviews();
         console.log('🚀 Kigali Bites ready!');
-        console.log('💳 Paypack link:', PAYPACK_LINK);
+        console.log('💳 Paypack API:', PAYPACK_API);
         console.log('🔥 Connected to Firebase:', firebaseConfig.projectId);
     </script>
 </body>
