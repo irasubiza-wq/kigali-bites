@@ -1183,6 +1183,7 @@
         let deliveryAddress = '';
         let deliveryPhone = '';
         let paypackRequestSucceeded = false;
+                let currentPaymentRef = null;
 
         // ==================== PAYPACK BACKEND ====================
         const PAYPACK_API = 'https://kigali-bites-api.onrender.com/api/paypack/cashin';
@@ -1791,6 +1792,7 @@
 
                 if (result.success) {
                     paypackRequestSucceeded = true;
+                                        currentPaymentRef = result.data?.ref || result.data?.data?.ref || null;
                     showToast('📱 Check your phone to approve payment', 'success');
 
                     const existing = document.getElementById('paypackBanner');
@@ -1865,7 +1867,7 @@
                     paymentMethod: currentPaymentMethod,
                     buyerLocation: buyerLocation,
                     paymentStatus: paymentStatus,
-                    paymentRef: null,
+                    paymentRef: currentPaymentRef,
                     status: 'pending',
                     createdAt: serverTimestamp()
                 });
@@ -1877,7 +1879,8 @@
                 buyerLocation = null;
                 deliveryAddress = '';
                 deliveryPhone = '';
-                paypackRequestSucceeded = false;
+               paypackRequestSucceeded = false;
+                currentPaymentRef = null;
 
                 renderAuthContent('success');
                 document.getElementById('orderNumDisplay').textContent = orderNumber;
