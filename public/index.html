@@ -784,6 +784,7 @@
         <nav class="page-tabs" id="pageTabs">
             <button class="page-tab active" data-page="home" onclick="showPage('home')"><i class="fas fa-home"></i> Home</button>
             <button class="page-tab" data-page="menu" onclick="showPage('menu')"><i class="fas fa-utensils"></i> Menu</button>
+            <button class="page-tab" data-page="restaurants" onclick="showPage('restaurants')"><i class="fas fa-store"></i> Restaurants</button>
             <button class="page-tab" data-page="reviews" onclick="showPage('reviews')"><i class="fas fa-star"></i> Reviews</button>
             <button class="page-tab" data-page="contact" onclick="showPage('contact')"><i class="fas fa-map-marker-alt"></i> Contact</button>
             <button class="page-tab" data-page="dashboard" id="dashTab" style="display:none;" onclick="showPage('dashboard')"><i class="fas fa-user"></i> My Account</button>
@@ -854,6 +855,22 @@
             </div>
             <div class="tabs" id="tabsContainer"></div>
             <div id="menuContainer"></div>
+        </section>
+    </div>
+
+    <div class="page" id="page-restaurants">
+        <section class="menu-board">
+            <div id="restaurantListView">
+                <div class="section-header">
+                    <h2>Rwandan <span>Restaurants</span></h2>
+                    <p>Discover local restaurants and the meals they serve</p>
+                </div>
+                <div class="search-container">
+                    <input type="text" id="restaurantSearch" placeholder="🔍 Search restaurants, locations or cuisine..." onkeyup="filterRestaurants()">
+                </div>
+                <div class="featured-grid" id="restaurantGrid"></div>
+            </div>
+            <div id="restaurantDetailView" style="display:none;"></div>
         </section>
     </div>
 
@@ -996,6 +1013,7 @@
                 <div class="admin-tabs">
                     <button class="admin-tab active" onclick="showAdminTab('orders', this)"><i class="fas fa-receipt"></i> Orders</button>
                     <button class="admin-tab" onclick="showAdminTab('menu', this)"><i class="fas fa-utensils"></i> Menu</button>
+                    <button class="admin-tab" onclick="showAdminTab('restaurants', this)"><i class="fas fa-store"></i> Restaurants</button>
                     <button class="admin-tab" onclick="showAdminTab('reviews', this)"><i class="fas fa-star"></i> Reviews</button>
                     <button class="admin-tab" onclick="showAdminTab('customers', this)"><i class="fas fa-users"></i> Customers</button>
                 </div>
@@ -1033,6 +1051,39 @@
                     </div>
                 </div>
                 
+                <div class="admin-panel" id="adminPanel-restaurants">
+                    <div class="top-bar">
+                        <h3>Restaurant Directory</h3>
+                        <div style="display:flex; gap:0.5rem; flex-wrap:wrap;">
+                            <input type="text" class="search-input" placeholder="🔍 Search restaurants..." onkeyup="filterAdminRestaurants()" id="adminRestaurantSearch">
+                            <button class="btn-sm primary" onclick="openRestaurantModal()"><i class="fas fa-plus"></i> Add Restaurant</button>
+                        </div>
+                    </div>
+                    <div class="table-wrapper">
+                        <table>
+                            <thead><tr><th>Image</th><th>Restaurant</th><th>Location</th><th>Cuisine</th><th>Meals</th><th>Actions</th></tr></thead>
+                            <tbody id="adminRestaurantsBody">
+                                <tr><td colspan="6" class="empty"><div class="icon">⏳</div><p>Loading...</p></td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div id="adminRestaurantMeals" style="display:none; margin-top:2rem;">
+                        <div class="top-bar">
+                            <h3 id="adminRestaurantMealsTitle">Meals</h3>
+                            <div style="display:flex; gap:0.5rem; flex-wrap:wrap;">
+                                <button class="btn-sm info" onclick="closeRestaurantMeals()"><i class="fas fa-times"></i> Close</button>
+                                <button class="btn-sm primary" onclick="openMealModal()"><i class="fas fa-plus"></i> Add Meal</button>
+                            </div>
+                        </div>
+                        <div class="table-wrapper">
+                            <table>
+                                <thead><tr><th>Image</th><th>Meal</th><th>Category</th><th>Price</th><th>Description</th><th>Actions</th></tr></thead>
+                                <tbody id="adminRestaurantMealsBody"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="admin-panel" id="adminPanel-reviews">
                     <div class="top-bar"><h3>Customer Reviews</h3></div>
                     <div id="adminReviewsContainer"><div class="empty"><div class="icon">⏳</div><p>Loading...</p></div></div>
@@ -1057,6 +1108,7 @@
             <div><h4>Quick Links</h4>
                 <a onclick="showPage('home')">Home</a>
                 <a onclick="showPage('menu')">Menu</a>
+                <a onclick="showPage('restaurants')">Restaurants</a>
                 <a onclick="showPage('reviews')">Reviews</a>
                 <a onclick="showPage('contact')">Contact</a>
             </div>
@@ -1131,6 +1183,58 @@
             <div class="modal-actions">
                 <button class="btn-sm danger" onclick="closeMenuModal()">Cancel</button>
                 <button class="btn-sm primary" onclick="saveMenuItem()" id="saveMenuBtn"><i class="fas fa-save"></i> Save Dish</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="restaurantModal">
+        <div class="modal">
+            <button class="close-x" onclick="closeRestaurantModal()">✕</button>
+            <h3 id="restaurantModalTitle">Add Restaurant</h3>
+            <p class="modal-sub" id="restaurantModalSub">Add a Rwandan restaurant to the directory</p>
+            <input type="hidden" id="restaurantEditId">
+            <div class="form-grid-modal">
+                <div class="form-group"><label>Restaurant Name *</label><input type="text" id="restName" placeholder="Repub Lounge"></div>
+                <div class="form-group"><label>Location</label><input type="text" id="restLocation" placeholder="Kimihurura, Kigali"></div>
+            </div>
+            <div class="form-grid-modal">
+                <div class="form-group"><label>Cuisine</label><input type="text" id="restCuisine" placeholder="Rwandan, Grill"></div>
+                <div class="form-group"><label>Phone</label><input type="tel" id="restPhone" placeholder="+250 78..."></div>
+            </div>
+            <div class="form-group"><label>Description</label><textarea id="restDesc" rows="2" placeholder="Traditional Rwandan dishes with a view of Kigali"></textarea></div>
+            <div class="form-group"><label>Image URL</label><input type="url" id="restImg" placeholder="https://images.unsplash.com/..."></div>
+            <div class="modal-actions">
+                <button class="btn-sm danger" onclick="closeRestaurantModal()">Cancel</button>
+                <button class="btn-sm primary" onclick="saveRestaurant()" id="saveRestaurantBtn"><i class="fas fa-save"></i> Save Restaurant</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="mealModal">
+        <div class="modal">
+            <button class="close-x" onclick="closeMealModal()">✕</button>
+            <h3 id="mealModalTitle">Add Meal</h3>
+            <p class="modal-sub" id="mealModalSub">Add a meal to this restaurant's menu</p>
+            <input type="hidden" id="mealEditId">
+            <div class="form-grid-modal">
+                <div class="form-group"><label>Meal Name *</label><input type="text" id="mealName" placeholder="Brochettes"></div>
+                <div class="form-group"><label>Menu Section</label>
+                    <select id="mealCategory" style="width:100%;padding:0.8rem 1rem;border-radius:12px;border:2px solid rgba(255,255,255,0.06);background:rgba(255,255,255,0.05);color:white;font-family:inherit;">
+                        <option value="Breakfast">Breakfast</option>
+                        <option value="Starters">Starters</option>
+                        <option value="Main" selected>Main</option>
+                        <option value="Sides">Sides</option>
+                        <option value="Drinks">Drinks</option>
+                        <option value="Desserts">Desserts</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group"><label>Price (RWF) *</label><input type="number" id="mealPrice" min="0" placeholder="5000"></div>
+            <div class="form-group"><label>Description</label><textarea id="mealDesc" rows="2" placeholder="Grilled goat skewers with plantains"></textarea></div>
+            <div class="form-group"><label>Image URL</label><input type="url" id="mealImg" placeholder="https://images.unsplash.com/..."></div>
+            <div class="modal-actions">
+                <button class="btn-sm danger" onclick="closeMealModal()">Cancel</button>
+                <button class="btn-sm primary" onclick="saveMeal()" id="saveMealBtn"><i class="fas fa-save"></i> Save Meal</button>
             </div>
         </div>
     </div>
@@ -1225,6 +1329,7 @@
             if (pageName === 'dashboard' && currentUser) loadUserDashboard();
             if (pageName === 'admin' && isAdmin) loadAdminData();
             if (pageName === 'reviews') loadReviews();
+            if (pageName === 'restaurants') loadRestaurants();
         };
 
         function updateStoreStatus() {
@@ -2150,6 +2255,7 @@
             loadAdminMenu();
             loadAdminReviews();
             loadAdminCustomers();
+            loadAdminRestaurants();
         }
 
         async function loadAdminOrders() {
@@ -2551,6 +2657,313 @@
         loadReviews();
         console.log('🚀 Kigali Bites ready!');
         console.log('💳 Paypack API:', PAYPACK_API);
+        // ==================== RESTAURANT DIRECTORY (Netlify Database) ====================
+        const FALLBACK_IMG = 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=600&h=400&fit=crop';
+        let allRestaurants = [];
+        let allAdminRestaurants = [];
+        let selectedAdminRestaurantId = null;
+
+        function esc(v) {
+            return String(v ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+        }
+        function safeUrl(u) {
+            return /^https?:\/\//i.test(u || '') ? esc(u) : FALLBACK_IMG;
+        }
+
+        async function adminFetch(url, options = {}) {
+            if (!auth.currentUser) throw new Error('Please sign in as an admin.');
+            const token = await auth.currentUser.getIdToken();
+            const res = await fetch(url, {
+                ...options,
+                headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}`, ...(options.headers || {}) }
+            });
+            const data = await res.json().catch(() => ({}));
+            if (!res.ok) throw new Error(data.error || 'Request failed');
+            return data;
+        }
+
+        async function loadRestaurants() {
+            const grid = document.getElementById('restaurantGrid');
+            document.getElementById('restaurantListView').style.display = 'block';
+            document.getElementById('restaurantDetailView').style.display = 'none';
+            grid.innerHTML = `<div class="empty" style="grid-column:1/-1;"><div class="icon">⏳</div><p>Loading restaurants...</p></div>`;
+            try {
+                const res = await fetch('/api/restaurants');
+                if (!res.ok) throw new Error();
+                allRestaurants = await res.json();
+                renderRestaurants(allRestaurants);
+            } catch (e) {
+                grid.innerHTML = `<div class="empty" style="grid-column:1/-1;"><div class="icon">⚠️</div><p>Could not load restaurants. Please try again.</p></div>`;
+            }
+        }
+
+        function renderRestaurants(list) {
+            const grid = document.getElementById('restaurantGrid');
+            if (!list.length) {
+                grid.innerHTML = `<div class="empty" style="grid-column:1/-1;"><div class="icon">🍽️</div><p>No restaurants listed yet. Check back soon!</p></div>`;
+                return;
+            }
+            grid.innerHTML = list.map(r => `
+                <div class="featured-card" onclick="openRestaurant(${r.id})">
+                    <img src="${safeUrl(r.imageUrl)}" alt="${esc(r.name)}" loading="lazy" onerror="this.src='${FALLBACK_IMG}'">
+                    <div class="fc-body">
+                        <h4>${esc(r.name)}</h4>
+                        ${r.location ? `<p style="color:#aaa; font-size:0.85rem; margin-bottom:0.3rem;"><i class="fas fa-map-marker-alt" style="color:var(--primary);"></i> ${esc(r.location)}</p>` : ''}
+                        ${r.cuisine ? `<span class="badge">${esc(r.cuisine)}</span>` : ''}
+                        <p style="color:#888; font-size:0.85rem; margin-top:0.5rem;">${r.mealCount || 0} meal${r.mealCount === 1 ? '' : 's'}</p>
+                        <button class="order-now">View Menu →</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        window.filterRestaurants = function() {
+            const term = document.getElementById('restaurantSearch').value.toLowerCase().trim();
+            renderRestaurants(allRestaurants.filter(r =>
+                [r.name, r.location, r.cuisine, r.description].some(v => (v || '').toLowerCase().includes(term))
+            ));
+        };
+
+        window.openRestaurant = async function(id) {
+            const view = document.getElementById('restaurantDetailView');
+            document.getElementById('restaurantListView').style.display = 'none';
+            view.style.display = 'block';
+            view.innerHTML = `<div class="empty"><div class="icon">⏳</div><p>Loading menu...</p></div>`;
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            try {
+                const res = await fetch('/api/restaurants/' + id);
+                if (!res.ok) throw new Error();
+                const r = await res.json();
+                const groups = {};
+                r.meals.forEach(m => (groups[m.category || 'Main'] ||= []).push(m));
+                const menuHtml = Object.keys(groups).length ? Object.keys(groups).map(cat => `
+                    <div style="margin-bottom: 3rem;">
+                        <h3 style="font-family:'Playfair Display',serif; font-size:1.8rem; margin-bottom:1.5rem; color: var(--primary);">${esc(cat)}</h3>
+                        <div class="menu-grid">${groups[cat].map(m => `
+                            <div class="menu-card">
+                                <img src="${safeUrl(m.imageUrl)}" alt="${esc(m.name)}" class="food-img" loading="lazy" onerror="this.src='${FALLBACK_IMG}'">
+                                <div class="card-body">
+                                    <div class="dish-header">
+                                        <span class="dish-name">${esc(m.name)}</span>
+                                        <span class="price">${(m.price || 0).toLocaleString()} RWF</span>
+                                    </div>
+                                    <div class="dish-desc">${esc(m.description)}</div>
+                                </div>
+                            </div>`).join('')}
+                        </div>
+                    </div>`).join('') : `<div class="empty"><div class="icon">🍽️</div><p>This restaurant hasn't added any meals yet.</p></div>`;
+                view.innerHTML = `
+                    <button class="btn-sm info" onclick="loadRestaurants()" style="margin-bottom:2rem;"><i class="fas fa-arrow-left"></i> All Restaurants</button>
+                    <div class="section-header">
+                        <h2>${esc(r.name)}</h2>
+                        ${r.description ? `<p>${esc(r.description)}</p>` : ''}
+                        <p style="margin-top:0.5rem; font-size:0.95rem;">
+                            ${r.location ? `<i class="fas fa-map-marker-alt" style="color:var(--primary);"></i> ${esc(r.location)}` : ''}
+                            ${r.cuisine ? ` &nbsp;·&nbsp; ${esc(r.cuisine)}` : ''}
+                            ${r.phone ? ` &nbsp;·&nbsp; <a href="tel:${esc(r.phone.replace(/\s+/g, ''))}" style="color:var(--primary);"><i class="fas fa-phone"></i> ${esc(r.phone)}</a>` : ''}
+                        </p>
+                    </div>
+                    ${menuHtml}
+                `;
+            } catch (e) {
+                view.innerHTML = `<button class="btn-sm info" onclick="loadRestaurants()" style="margin-bottom:2rem;"><i class="fas fa-arrow-left"></i> All Restaurants</button>
+                    <div class="empty"><div class="icon">⚠️</div><p>Could not load this restaurant.</p></div>`;
+            }
+        };
+
+        // ---------- Admin: restaurants & meals ----------
+        async function loadAdminRestaurants() {
+            if (!isAdmin) return;
+            try {
+                allAdminRestaurants = await adminFetch('/api/admin/restaurants');
+                filterAdminRestaurants();
+                if (selectedAdminRestaurantId) renderAdminRestaurantMeals();
+            } catch (e) {
+                document.getElementById('adminRestaurantsBody').innerHTML =
+                    `<tr><td colspan="6" class="empty"><div class="icon">⚠️</div><p>${esc(e.message)}</p></td></tr>`;
+            }
+        }
+
+        window.filterAdminRestaurants = function() {
+            const term = (document.getElementById('adminRestaurantSearch').value || '').toLowerCase();
+            const list = allAdminRestaurants.filter(r =>
+                [r.name, r.location, r.cuisine].some(v => (v || '').toLowerCase().includes(term)));
+            const tbody = document.getElementById('adminRestaurantsBody');
+            if (!list.length) {
+                tbody.innerHTML = `<tr><td colspan="6" class="empty"><div class="icon">🏪</div><p>No restaurants yet. Add one!</p></td></tr>`;
+                return;
+            }
+            tbody.innerHTML = list.map(r => `
+                <tr>
+                    <td><img src="${safeUrl(r.imageUrl)}" class="menu-thumb" onerror="this.src='${FALLBACK_IMG}'"></td>
+                    <td style="font-weight:600;">${esc(r.name)}</td>
+                    <td style="font-size:0.85rem; color:#aaa;">${esc(r.location)}</td>
+                    <td>${r.cuisine ? `<span class="badge">${esc(r.cuisine)}</span>` : ''}</td>
+                    <td>${r.meals.length}</td>
+                    <td style="white-space:nowrap;">
+                        <button class="btn-sm success small" onclick="manageRestaurantMeals(${r.id})" style="margin-right:0.3rem;" title="Manage meals"><i class="fas fa-utensils"></i> Meals</button>
+                        <button class="btn-sm info small" onclick="openRestaurantModal(${r.id})" style="margin-right:0.3rem;" title="Edit"><i class="fas fa-edit"></i></button>
+                        <button class="btn-sm danger small" onclick="deleteRestaurant(${r.id})" title="Delete"><i class="fas fa-trash"></i></button>
+                    </td>
+                </tr>
+            `).join('');
+        };
+
+        window.openRestaurantModal = function(id) {
+            const r = id ? allAdminRestaurants.find(x => x.id === id) : null;
+            document.getElementById('restaurantModalTitle').textContent = r ? 'Edit Restaurant' : 'Add Restaurant';
+            document.getElementById('restaurantModalSub').textContent = r ? 'Update restaurant details' : 'Add a Rwandan restaurant to the directory';
+            document.getElementById('restaurantEditId').value = r ? r.id : '';
+            document.getElementById('restName').value = r?.name || '';
+            document.getElementById('restLocation').value = r?.location || '';
+            document.getElementById('restCuisine').value = r?.cuisine || '';
+            document.getElementById('restPhone').value = r?.phone || '';
+            document.getElementById('restDesc').value = r?.description || '';
+            document.getElementById('restImg').value = r?.imageUrl || '';
+            document.getElementById('restaurantModal').classList.add('active');
+        };
+        window.closeRestaurantModal = function() {
+            document.getElementById('restaurantModal').classList.remove('active');
+        };
+
+        window.saveRestaurant = async function() {
+            const id = document.getElementById('restaurantEditId').value;
+            const body = {
+                name: document.getElementById('restName').value.trim(),
+                location: document.getElementById('restLocation').value.trim(),
+                cuisine: document.getElementById('restCuisine').value.trim(),
+                phone: document.getElementById('restPhone').value.trim(),
+                description: document.getElementById('restDesc').value.trim(),
+                imageUrl: document.getElementById('restImg').value.trim()
+            };
+            if (!body.name) return showToast('❌ Restaurant name is required', 'error');
+            const btn = document.getElementById('saveRestaurantBtn');
+            btn.disabled = true;
+            try {
+                await adminFetch(id ? `/api/admin/restaurants/${id}` : '/api/admin/restaurants', {
+                    method: id ? 'PUT' : 'POST', body: JSON.stringify(body)
+                });
+                showToast(id ? '✅ Restaurant updated' : '✅ Restaurant added', 'success');
+                closeRestaurantModal();
+                await loadAdminRestaurants();
+            } catch (e) {
+                showToast('❌ ' + e.message, 'error');
+            } finally {
+                btn.disabled = false;
+            }
+        };
+
+        window.deleteRestaurant = async function(id) {
+            const r = allAdminRestaurants.find(x => x.id === id);
+            if (!r || !confirm(`Delete "${r.name}" and all of its meals?`)) return;
+            try {
+                await adminFetch(`/api/admin/restaurants/${id}`, { method: 'DELETE' });
+                if (selectedAdminRestaurantId === id) closeRestaurantMeals();
+                showToast('🗑️ Restaurant deleted', 'success');
+                await loadAdminRestaurants();
+            } catch (e) {
+                showToast('❌ ' + e.message, 'error');
+            }
+        };
+
+        window.manageRestaurantMeals = function(id) {
+            selectedAdminRestaurantId = id;
+            renderAdminRestaurantMeals();
+            document.getElementById('adminRestaurantMeals').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        };
+        window.closeRestaurantMeals = function() {
+            selectedAdminRestaurantId = null;
+            document.getElementById('adminRestaurantMeals').style.display = 'none';
+        };
+
+        function renderAdminRestaurantMeals() {
+            const r = allAdminRestaurants.find(x => x.id === selectedAdminRestaurantId);
+            const wrap = document.getElementById('adminRestaurantMeals');
+            if (!r) { wrap.style.display = 'none'; return; }
+            wrap.style.display = 'block';
+            document.getElementById('adminRestaurantMealsTitle').innerHTML = `Meals at <span style="color:var(--primary);">${esc(r.name)}</span>`;
+            const tbody = document.getElementById('adminRestaurantMealsBody');
+            if (!r.meals.length) {
+                tbody.innerHTML = `<tr><td colspan="6" class="empty"><div class="icon">🍽️</div><p>No meals yet. Add one!</p></td></tr>`;
+                return;
+            }
+            tbody.innerHTML = r.meals.map(m => `
+                <tr>
+                    <td><img src="${safeUrl(m.imageUrl)}" class="menu-thumb" onerror="this.src='${FALLBACK_IMG}'"></td>
+                    <td style="font-weight:600;">${esc(m.name)}</td>
+                    <td><span class="badge">${esc(m.category)}</span></td>
+                    <td style="color:var(--primary); font-weight:700;">${(m.price || 0).toLocaleString()} RWF</td>
+                    <td style="font-size:0.85rem; color:#aaa; max-width:250px;">${esc(m.description)}</td>
+                    <td style="white-space:nowrap;">
+                        <button class="btn-sm info small" onclick="openMealModal(${m.id})" style="margin-right:0.3rem;"><i class="fas fa-edit"></i></button>
+                        <button class="btn-sm danger small" onclick="deleteMeal(${m.id})"><i class="fas fa-trash"></i></button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        window.openMealModal = function(mealId) {
+            const r = allAdminRestaurants.find(x => x.id === selectedAdminRestaurantId);
+            if (!r) return;
+            const m = mealId ? r.meals.find(x => x.id === mealId) : null;
+            document.getElementById('mealModalTitle').textContent = m ? 'Edit Meal' : 'Add Meal';
+            document.getElementById('mealModalSub').textContent = (m ? 'Update a meal at ' : 'Add a meal to ') + r.name;
+            document.getElementById('mealEditId').value = m ? m.id : '';
+            document.getElementById('mealName').value = m?.name || '';
+            const cat = document.getElementById('mealCategory');
+            const catVal = m?.category || 'Main';
+            if (![...cat.options].some(o => o.value === catVal)) cat.add(new Option(catVal, catVal));
+            cat.value = catVal;
+            document.getElementById('mealPrice').value = m ? m.price : '';
+            document.getElementById('mealDesc').value = m?.description || '';
+            document.getElementById('mealImg').value = m?.imageUrl || '';
+            document.getElementById('mealModal').classList.add('active');
+        };
+        window.closeMealModal = function() {
+            document.getElementById('mealModal').classList.remove('active');
+        };
+
+        window.saveMeal = async function() {
+            const id = document.getElementById('mealEditId').value;
+            const priceRaw = document.getElementById('mealPrice').value;
+            const body = {
+                name: document.getElementById('mealName').value.trim(),
+                category: document.getElementById('mealCategory').value,
+                price: Number(priceRaw),
+                description: document.getElementById('mealDesc').value.trim(),
+                imageUrl: document.getElementById('mealImg').value.trim()
+            };
+            if (!body.name) return showToast('❌ Meal name is required', 'error');
+            if (priceRaw === '' || !(body.price >= 0)) return showToast('❌ Please enter a valid price', 'error');
+            const btn = document.getElementById('saveMealBtn');
+            btn.disabled = true;
+            try {
+                await adminFetch(id ? `/api/admin/meals/${id}` : `/api/admin/restaurants/${selectedAdminRestaurantId}/meals`, {
+                    method: id ? 'PUT' : 'POST', body: JSON.stringify(body)
+                });
+                showToast(id ? '✅ Meal updated' : '✅ Meal added', 'success');
+                closeMealModal();
+                await loadAdminRestaurants();
+            } catch (e) {
+                showToast('❌ ' + e.message, 'error');
+            } finally {
+                btn.disabled = false;
+            }
+        };
+
+        window.deleteMeal = async function(id) {
+            if (!confirm('Delete this meal?')) return;
+            try {
+                await adminFetch(`/api/admin/meals/${id}`, { method: 'DELETE' });
+                showToast('🗑️ Meal deleted', 'success');
+                await loadAdminRestaurants();
+            } catch (e) {
+                showToast('❌ ' + e.message, 'error');
+            }
+        };
+
+        window.loadRestaurants = loadRestaurants;
+
         console.log('🔥 Connected to Firebase:', firebaseConfig.projectId);
     </script>
 </body>
